@@ -1,6 +1,10 @@
 from fastapi import WebSocket, WebSocketDisconnect
 import asyncio
 
+from backend.api.internal.ac_framework import component
+from backend.api.main import weedzap
+
+@component(weedzap)
 class WebsocketService:
     def __init__(self):
         self.active_connection: WebSocket | None = None
@@ -16,6 +20,3 @@ class WebsocketService:
     async def disconnect(self):
         async with self.lock:
             self.active_connection = None
-
-def get_websocket_service():
-    return WebsocketService()

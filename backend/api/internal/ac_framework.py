@@ -1,3 +1,6 @@
+from fastapi import Depends
+
+
 class ApplicationContext:
     def __init__(self):
         self.__context = {}
@@ -21,7 +24,14 @@ class App:
 
 def component(app: App):
     def wrapper(cls):
-        app.get_context().add_component(cls())
+        instance = cls()
+        app.get_context().add_component(instance)
         cls.get_context = lambda: app.get_context()
         cls.is_component = lambda: True
+        cls.get_instance = lambda: instance
+        return cls
     return wrapper
+
+def inject(app: App, cls):
+    return Depends(lambda: app.get_context().get_component(cls))
+
