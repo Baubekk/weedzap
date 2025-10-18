@@ -3,5 +3,5 @@ class FastAPIWrapper:
         self.__fastapi = fastapi
         super().__init__()
 
-    def get_app(self):
+    def get_fastapi(self):
         return self.__fastapi

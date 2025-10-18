@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Laser Control</title>
+    <style>
+        :root {
+            --primary-green: #00ff9d;
+            --secondary-green: #00cc7a;
+            --dark-bg: #0a0a0a;
+            --panel-bg: rgba(0, 255, 157, 0.05);
+            --panel-border: rgba(0, 255, 157, 0.2);
+            --text-color: #e0e0e0;
+            --glow: 0 0 10px rgba(0, 255, 157, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 157, 0.05) 0%, transparent 20%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--primary-green);
+            text-shadow: var(--glow);
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-green);
+            display: flex;
+            align-items: center;
+        }
+
+        .panel-title i {
+            margin-right: 10px;
+        }
+
+        .control-section {
+            margin-bottom: 30px;
+        }
+
+        .axis-control {
+            margin-bottom: 25px;
+        }
+
+        .axis-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .axis-label i {
+            margin-right: 8px;
+            color: var(--primary-green);
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--panel-border);
+            color: var(--text-color);
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 255, 157, 0.1);
+            border-color: var(--primary-green);
+            box-shadow: var(--glow);
+        }
+
+        .control-btn:active {
+            transform: scale(0.98);
+        }
+
+        .control-btn i {
+            margin-right: 8px;
+        }
+
+        .fire-btn {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 50, 50, 0.5);
+            color: #ff5555;
+            padding: 15px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .fire-btn:hover {
+            background: rgba(255, 0, 0, 0.3);
+            border-color: #ff5555;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        }
+
+        .settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .setting-group {
+            margin-bottom: 15px;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .setting-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--panel-border);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+
+        .setting-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: var(--glow);
+        }
+
+        .change-btn {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .change-btn:hover {
+            background: rgba(0, 255, 157, 0.2);
+            box-shadow: var(--glow);
+        }
+
+        .camera-feed {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--panel-border);
+        }
+
+        .camera-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, #0a0a0a, #1a1a1a);
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            border: 1px solid var(--panel-border);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary-green);
+            margin-right: 8px;
+            box-shadow: var(--glow);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            border-top: 1px solid var(--panel-border);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Animation for the laser firing */
+        @keyframes laserFire {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .laser-active {
+            animation: laserFire 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>WEEDZAP LASER CONTROL</h1>
+            <div class="subtitle">3-Axis Precision Laser System</div>
+        </header>
+
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="panel">
+                    <div class="panel-title">
+                        <i>🧭</i> MOVEMENT CONTROL
+                    </div>
+                    
+                    <div class="control-section">
+                        <div class="axis-control">
+                            <div class="axis-label">
+                                <i>↕️</i> X-AXIS MOVEMENT
+                            </div>
+                            <div class="button-group">
+                                <button class="control-btn" id="x-minus">
+                                    <i>←</i> DECREASE X
+                                </button>
+                                <button class="control-btn" id="x-plus">
+                                    <i>→</i> INCREASE X
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="axis-control">
+                            <div class="axis-label">
+                                <i>↔️</i> Y-AXIS MOVEMENT
+                            </div>
+                            <div class="button-group">
+                                <button class="control-btn" id="y-minus">
+                                    <i>↓</i> DECREASE Y
+                                </button>
+                                <button class="control-btn" id="y-plus">
+                                    <i>↑</i> INCREASE Y
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="axis-control">
+                            <div class="axis-label">
+                                <i>🔄</i> Z-AXIS MOVEMENT
+                            </div>
+                            <div class="button-group">
+                                <button class="control-btn" id="z-minus">
+                                    <i>↙️</i> DECREASE Z
+                                </button>
+                                <button class="control-btn" id="z-plus">
+                                    <i>↗️</i> INCREASE Z
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button class="control-btn fire-btn" id="fire-laser">
+                            <i>🔴</i> FIRE LASER
+                        </button>
+                    </div>
+                    
+                    <div class="panel-title" style="margin-top: 30px;">
+                        <i>⚙️</i> SYSTEM SETTINGS
+                    </div>
+                    
+                    <div class="settings">
+                        <div class="setting-group">
+                            <label class="setting-label">MAX SPEED (1-10)</label>
+                            <input type="number" class="setting-input" id="max-speed" min="1" max="10" step="0.1" value="5.0">
+                            <button class="change-btn" id="change-speed">CHANGE SPEED</button>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label class="setting-label">ACCELERATION (0-100)</label>
+                            <input type="number" class="setting-input" id="acceleration" min="0" max="100" step="0.1" value="50.0">
+                            <button class="change-btn" id="change-acceleration">CHANGE ACCELERATION</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div class="panel">
+                    <div class="panel-title">
+                        <i>📹</i> ROBOT CAMERA FEED
+                    </div>
+                    
+                    <div class="camera-feed">
+                        <div class="camera-placeholder">
+                            <div>CAMERA FEED INITIALIZING...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="status-bar">
+                        <div class="status-item">
+                            <div class="status-dot"></div>
+                            <span>SYSTEM: ONLINE</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-dot"></div>
+                            <span>LASER: READY</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-dot"></div>
+                            <span>CONNECTION: STABLE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            Quantum Laser Control System v2.1 | Secure Connection Established
+        </footer>
+    </div>
+
+    <script>
+        // Movement control buttons
+        document.getElementById('x-minus').addEventListener('click', () => moveAxis('x', -1));
+        document.getElementById('x-plus').addEventListener('click', () => moveAxis('x', 1));
+        document.getElementById('y-minus').addEventListener('click', () => moveAxis('y', -1));
+        document.getElementById('y-plus').addEventListener('click', () => moveAxis('y', 1));
+        document.getElementById('z-minus').addEventListener('click', () => moveAxis('z', -1));
+        document.getElementById('z-plus').addEventListener('click', () => moveAxis('z', 1));
+        
+        // Fire laser button
+        document.getElementById('fire-laser').addEventListener('click', fireLaser);
+        
+        // Change settings buttons
+        document.getElementById('change-speed').addEventListener('click', changeSpeed);
+        document.getElementById('change-acceleration').addEventListener('click', changeAcceleration);
+        
+        function moveAxis(axis, direction) {
+            console.log(`Moving ${axis.toUpperCase()}-axis in direction: ${direction > 0 ? '+' : '-'}`);
+            // In a real implementation, this would send a command to the robot
+        }
+        
+        function fireLaser() {
+            console.log("Firing laser!");
+            const fireBtn = document.getElementById('fire-laser');
+            fireBtn.classList.add('laser-active');
+            setTimeout(() => {
+                fireBtn.classList.remove('laser-active');
+            }, 500);
+            // In a real implementation, this would trigger the laser
+        }
+        
+        function changeSpeed() {
+            const speedInput = document.getElementById('max-speed');
+            const speed = parseFloat(speedInput.value);
+            
+            if (isNaN(speed) || speed < 1 || speed > 10) {
+                alert("Please enter a valid speed between 1 and 10");
+                return;
+            }
+            
+            console.log(`Changing max speed to: ${speed}`);
+            // In a real implementation, this would update the robot's speed setting
+        }
+        
+        function changeAcceleration() {
+            const accInput = document.getElementById('acceleration');
+            const acceleration = parseFloat(accInput.value);
+            
+            if (isNaN(acceleration) || acceleration < 0 || acceleration > 100) {
+                alert("Please enter a valid acceleration between 0 and 100");
+                return;
+            }
+            
+            console.log(`Changing acceleration to: ${acceleration}`);
+            // In a real implementation, this would update the robot's acceleration setting
+        }
+        
+        // Simulate camera feed initialization
+        setTimeout(() => {
+            const cameraPlaceholder = document.querySelector('.camera-placeholder');
+            cameraPlaceholder.innerHTML = '<div>CAMERA FEED ACTIVE</div><div style="font-size:0.8rem;margin-top:10px;">LIVE STREAMING</div>';
+        }, 2000);
+    </script>
+</body>
+</html>

@@ -27,7 +27,7 @@ def component(app: App):
         instance = cls()
         app.get_context().add_component(instance)
         cls.get_context = lambda: app.get_context()
-        cls.is_component = lambda: True
+        cls.__is_component = lambda: True
         cls.get_instance = lambda: instance
         return cls
     return wrapper
