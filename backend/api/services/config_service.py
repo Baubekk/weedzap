@@ -35,3 +35,15 @@ class ConfigService:
 
     def get_movement_mode(self):
         return self.get("mode")
+    
+    def set_laser_speed(self, speed):
+        self.set("laser_speed", speed)
+
+    def get_laser_speed(self):
+        return self.get("laser_speed")
+    
+    def set_laser_acceleration(self, acceleration):
+        self.set("laser_acceleration", acceleration)
+
+    def get_laser_acceleration(self):
+        return self.get("laser_acceleration")
