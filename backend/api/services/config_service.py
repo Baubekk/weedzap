@@ -7,6 +7,10 @@ class MovementMode(Enum):
     HOLD = "hold"
     STEP = "step"
 
+class LaserState(Enum):
+    SAFE = "safe"
+    ARMED = "armed"
+
 @component(weedzap)
 class ConfigService:
     def __init__(self):
@@ -36,6 +40,12 @@ class ConfigService:
     def get_movement_mode(self):
         return self.get("mode")
     
+    def set_laser_movement_mode(self, mode: MovementMode):
+        self.set("laser_movement_mode", mode)
+
+    def get_laser_movement_mode(self):
+        return self.get("laser_movement_mode")
+    
     def set_laser_speed(self, speed):
         self.set("laser_speed", speed)
 
@@ -47,3 +57,9 @@ class ConfigService:
 
     def get_laser_acceleration(self):
         return self.get("laser_acceleration")
+    
+    def set_laser_state(self, state: LaserState):
+        self.set("laser_state", state)
+
+    def get_laser_state(self):
+        return self.get("laser_state")

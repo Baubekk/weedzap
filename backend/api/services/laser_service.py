@@ -11,6 +11,7 @@ class LaserComponent(Enum):
 @component(weedzap)
 class LaserService:
     def __init__(self):
+        self.is_firing = False
         self.get_config_service = lambda: weedzap.get(ConfigService)
 
     async def handle(self, data: dict):
