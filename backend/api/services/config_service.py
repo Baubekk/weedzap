@@ -15,7 +15,7 @@ class LaserState(Enum):
 @component(weedzap)
 class ConfigService:
     def __init__(self):
-        self.get_arduino_service = lambda: weedzap.get(ArduinoService)
+        self.get_arduino_service = lambda: weedzap.get_context().get_component(ArduinoService)
 
     def _set(self, key, value):
         self.__config[key] = value

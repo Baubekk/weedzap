@@ -1,14 +1,15 @@
 from backend.api.internal.ac_framework import component
 from backend.api.main import weedzap
 from backend.api.services.config_service import ConfigService, MovementMode
+from backend.api.services.handler_service import HandlerService
 from backend.api.services.websocket_service import WebsocketService
 
 @component(weedzap)
-class MovementService:
+class MovementService(HandlerService):
     def __init__(self):
         self.current = None
         self.queued = None
-        self.get_config_service = lambda: weedzap.get(ConfigService)
+        self.get_config_service = lambda: weedzap.get_context().get_component(ConfigService)
 
     async def handle(self, data: dict):
         movement_mode = MovementMode(data.get("mode"))

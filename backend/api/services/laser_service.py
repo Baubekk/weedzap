@@ -3,6 +3,7 @@ from backend.api.internal.ac_framework import component
 from backend.api.main import weedzap
 from backend.api.services.arduino_service import ArduinoService
 from backend.api.services.config_service import ConfigService, LaserState, MovementMode
+from backend.api.services.handler_service import HandlerService
 
 class LaserComponent(Enum):
     MOVEMENT = "movement"
@@ -10,10 +11,10 @@ class LaserComponent(Enum):
 
 #fuck the variable naming in this class (i did it myself)
 @component(weedzap)
-class LaserService:
+class LaserService(HandlerService):
     def __init__(self):
-        self.get_config_service = lambda: weedzap.get(ConfigService)
-        self.get_arduino_service = lambda: weedzap.get(ArduinoService)
+        self.get_config_service = lambda: weedzap.get_context().get_component(ConfigService)
+        self.get_arduino_service = lambda: weedzap.get_context().get_component(ArduinoService)
 
     async def handle(self, data: dict):
         component = LaserComponent(data.get("component"))
