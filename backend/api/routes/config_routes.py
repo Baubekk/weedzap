@@ -2,7 +2,7 @@ from fastapi import Body
 from pydantic import Field
 from backend.api.internal.ac_framework import inject
 from backend.api.main import weedzap
-from backend.api.services.config_service import ConfigService, MovementMode
+from backend.api.services.config_service import ConfigService, LaserState, MovementMode
 
 fastapi = weedzap.get_fastapi()
 
@@ -29,7 +29,7 @@ async def get_speed(config_service: ConfigService = inject(weedzap, ConfigServic
     }
 
 @fastapi.post("/config/speed")
-async def set_speed(speed: float = Body(..., ge=0, le=10), config_service: ConfigService = inject(weedzap, ConfigService)):
+async def set_speed(speed: float = Body(..., ge=0, le=10000), config_service: ConfigService = inject(weedzap, ConfigService)):
     config_service.set_speed(speed)
 
 @fastapi.get("/config/movement-mode")
@@ -73,7 +73,7 @@ async def get_laser_speed(config_service: ConfigService = inject(weedzap, Config
     }
 
 @fastapi.post("/config/laser/speed")
-async def set_laser_speed(laser_speed: float = Body(..., ge=0, le=10), config_service: ConfigService = inject(weedzap, ConfigService)):
+async def set_laser_speed(laser_speed: float = Body(..., ge=0, le=10000), config_service: ConfigService = inject(weedzap, ConfigService)):
     config_service.set_laser_speed(laser_speed)
 
 @fastapi.get("/config/laser/acceleration")
@@ -83,5 +83,15 @@ async def get_laser_acceleration(config_service: ConfigService = inject(weedzap,
     }
 
 @fastapi.post("/config/laser/acceleration")
-async def set_laser_acceleration(laser_acceleration: float = Body(..., ge=0, le=10), config_service: ConfigService = inject(weedzap, ConfigService)):
+async def set_laser_acceleration(laser_acceleration: float = Body(..., ge=0, le=10000), config_service: ConfigService = inject(weedzap, ConfigService)):
     config_service.set_laser_acceleration(laser_acceleration)
+
+@fastapi.get("/config/laser/state")
+async def get_laser_state(config_service: ConfigService = inject(weedzap, ConfigService)):
+    return {
+        "laser_state": config_service.get_laser_state()
+    }
+
+@fastapi.post("/config/laser/state")
+async def set_laser_state(laser_state: LaserState = Body(..., enum=LaserState), config_service: ConfigService = inject(weedzap, ConfigService)):
+    config_service.set_laser_state(laser_state)

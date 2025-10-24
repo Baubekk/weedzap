@@ -1,7 +1,8 @@
 from enum import Enum
 from backend.api.internal.ac_framework import component
 from backend.api.main import weedzap
-from backend.api.services.config_service import ConfigService, MovementMode
+from backend.api.services.arduino_service import ArduinoService
+from backend.api.services.config_service import ConfigService, LaserState, MovementMode
 
 class LaserComponent(Enum):
     MOVEMENT = "movement"
@@ -11,14 +12,14 @@ class LaserComponent(Enum):
 @component(weedzap)
 class LaserService:
     def __init__(self):
-        self.is_firing = False
         self.get_config_service = lambda: weedzap.get(ConfigService)
+        self.get_arduino_service = lambda: weedzap.get(ArduinoService)
 
     async def handle(self, data: dict):
         component = LaserComponent(data.get("component"))
         if component == LaserComponent.MOVEMENT:
             await self.movement(data.get("data"))
-        elif component == LaserComponent.FIRE:
+        elif component == LaserComponent.FIRING:
             await self.firing(data.get("data"))
     
     async def movement(self, data: dict):
@@ -33,10 +34,40 @@ class LaserService:
             await self.step(data.get("data"))
 
     async def firing(self, data: dict):
-        pass
+        if self.get_config_service().get_laser_state() != LaserState.ARMED:
+            return {"error": "Laser is not armed. Change to armed state first. POST /config/laser/state with body { \"laser_state\": \"armed\" }. When done, POST /config/laser/state with body { \"laser_state\": \"safe\" }"}
+        if data.get("active") is True:
+            await self.get_arduino_service().send("l 1")
+        else:
+            await self.get_arduino_service().send("l 0")
 
     async def hold(self, data: dict):
-        pass
+        axis = data.get("axis")
+        if axis not in ["x", "y", "z"]:
+            return {"error": "Invalid axis"}
+        active = data.get("active")
+
+        msg = axis + "h "
+        if active is True:
+            positive = data.get("positive")
+            if positive is True:
+                msg += "1"
+            else:
+                msg += "-1"
+        else:
+            msg += "0"
+
+        await self.get_arduino_service().send(msg)
+            
 
     async def step(self, data: dict):
-        pass
+        axis = data.get("axis")
+        if axis not in ["x", "y", "z"]:
+            return {"error": "Invalid axis"}
+        value = data.get("value")
+        if not isinstance(value, int):
+            return {"error": "Value must be an integer"}
+
+        msg = f"{axis}s {value}"
+
+        await self.get_arduino_service().send(msg)

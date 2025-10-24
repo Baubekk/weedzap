@@ -2,6 +2,7 @@ from enum import Enum
 
 from backend.api.internal.ac_framework import component
 from backend.api.main import weedzap
+from backend.api.services.arduino_service import ArduinoService
 
 class MovementMode(Enum):
     HOLD = "hold"
@@ -14,7 +15,7 @@ class LaserState(Enum):
 @component(weedzap)
 class ConfigService:
     def __init__(self):
-        pass
+        self.get_arduino_service = lambda: weedzap.get(ArduinoService)
 
     def _set(self, key, value):
         self.__config[key] = value
