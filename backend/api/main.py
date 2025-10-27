@@ -6,8 +6,11 @@ from internal.fastapi_wrapper import FastAPIWrapper
 
 class WeedzapApp(App, FastAPIWrapper):
     def __init__(self, fastapi: FastAPI):
-        super().__init__(fastapi = fastapi)
+        App.__init__(self)
+        FastAPIWrapper.__init__(self, fastapi = fastapi)
 
 fastapi_app = FastAPI()
 
 weedzap = WeedzapApp(fastapi_app)
+
+app = weedzap.get_fastapi()
