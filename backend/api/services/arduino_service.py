@@ -1,17 +1,16 @@
 import threading
-from backend.api.internal.ac_framework import component
-from backend.api.main import weedzap
-
 import serial
 import time
+from ..internal.ac_framework import component, inject
 
-@component(weedzap)
+@component
 class ArduinoService:
     def __init__(self):
         self.retry_interval = 5
         self.serial = None
         self._stop = False
         self.thread = threading.Thread(target=self._connection_loop, daemon=True)
+        self.baudrate = 9600 # Assuming a default baudrate, adjust if necessary
 
     def start(self):
         self.thread.start()
@@ -68,5 +67,9 @@ class ArduinoService:
             print("Lost connection during read.")
             self.serial.close()
             return None
+
+    def is_connected(self):
+        return self.serial and self.serial.is_open
+
 
             

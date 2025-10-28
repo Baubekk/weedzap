@@ -1,8 +1,7 @@
 from enum import Enum
 
-from backend.api.internal.ac_framework import component
-from backend.api.main import weedzap
-from backend.api.services.arduino_service import ArduinoService
+from ..internal.ac_framework import component, inject
+from .arduino_service import ArduinoService
 
 class MovementMode(Enum):
     HOLD = "hold"
@@ -12,10 +11,18 @@ class LaserState(Enum):
     SAFE = "safe"
     ARMED = "armed"
 
-@component(weedzap)
+@component
 class ConfigService:
-    def __init__(self):
-        self.get_arduino_service = lambda: weedzap.get_context().get_component(ArduinoService)
+    def __init__(self, arduino_service: ArduinoService = inject(ArduinoService)):
+        self.__config = {}
+        self.set_movement_mode(MovementMode.HOLD)
+        self.set_speed(1000)
+        self.set_laser_movement_mode(MovementMode.HOLD)
+        self.set_laser_speed(1000)
+        self.set_laser_acceleration(1000)
+        self.set_laser_state(LaserState.SAFE)
+        
+        self.arduino_service = arduino_service
 
     def _set(self, key, value):
         self.__config[key] = value
@@ -30,37 +37,37 @@ class ConfigService:
         return self._get(key)
     
     def set_speed(self, speed):
-        self.set("speed", speed)
+        self._set("speed", speed)
 
     def get_speed(self):
-        return self.get("speed")
+        return self._get("speed")
     
     def set_movement_mode(self, mode: MovementMode):
-        self.set("mode", mode)
+        self._set("mode", mode)
 
     def get_movement_mode(self):
-        return self.get("mode")
+        return self._get("mode")
     
     def set_laser_movement_mode(self, mode: MovementMode):
-        self.set("laser_movement_mode", mode)
+        self._set("laser_movement_mode", mode)
 
     def get_laser_movement_mode(self):
-        return self.get("laser_movement_mode")
+        return self._get("laser_movement_mode")
     
     def set_laser_speed(self, speed):
-        self.set("laser_speed", speed)
+        self._set("laser_speed", speed)
 
     def get_laser_speed(self):
-        return self.get("laser_speed")
+        return self._get("laser_speed")
     
     def set_laser_acceleration(self, acceleration):
-        self.set("laser_acceleration", acceleration)
+        self._set("laser_acceleration", acceleration)
 
     def get_laser_acceleration(self):
-        return self.get("laser_acceleration")
+        return self._get("laser_acceleration")
     
     def set_laser_state(self, state: LaserState):
-        self.set("laser_state", state)
+        self._set("laser_state", state)
 
     def get_laser_state(self):
-        return self.get("laser_state")
+        return self._get("laser_state")

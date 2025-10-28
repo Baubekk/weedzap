@@ -102,3 +102,4 @@ xkit==0.0.0
 xlrd==2.0.1
 yt-dlp==2024.4.9
 opencv-python
+uvicorn==0.29.0

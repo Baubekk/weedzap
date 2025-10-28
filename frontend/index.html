@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quantum Laser Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
     <style>
         :root {
             --primary-green: #00ff9d;
@@ -19,7 +22,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Orbitron', sans-serif;
         }
 
         body {
@@ -285,59 +288,59 @@
             <div class="left-panel">
                 <div class="panel">
                     <div class="panel-title">
-                        <i>🧭</i> MOVEMENT CONTROL
+                        <i class="fas fa-compass"></i> MOVEMENT CONTROL
                     </div>
                     
                     <div class="control-section">
                         <div class="axis-control">
                             <div class="axis-label">
-                                <i>↕️</i> X-AXIS MOVEMENT
+                                <i class="fas fa-arrows-alt-v"></i> X-AXIS MOVEMENT
                             </div>
                             <div class="button-group">
                                 <button class="control-btn" id="x-minus">
-                                    <i>←</i> DECREASE X
+                                    <i class="fas fa-arrow-left"></i> DECREASE X
                                 </button>
                                 <button class="control-btn" id="x-plus">
-                                    <i>→</i> INCREASE X
+                                    <i class="fas fa-arrow-right"></i> INCREASE X
                                 </button>
                             </div>
                         </div>
                         
                         <div class="axis-control">
                             <div class="axis-label">
-                                <i>↔️</i> Y-AXIS MOVEMENT
+                                <i class="fas fa-arrows-alt-h"></i> Y-AXIS MOVEMENT
                             </div>
                             <div class="button-group">
                                 <button class="control-btn" id="y-minus">
-                                    <i>↓</i> DECREASE Y
+                                    <i class="fas fa-arrow-down"></i> DECREASE Y
                                 </button>
                                 <button class="control-btn" id="y-plus">
-                                    <i>↑</i> INCREASE Y
+                                    <i class="fas fa-arrow-up"></i> INCREASE Y
                                 </button>
                             </div>
                         </div>
                         
                         <div class="axis-control">
                             <div class="axis-label">
-                                <i>🔄</i> Z-AXIS MOVEMENT
+                                <i class="fas fa-sync-alt"></i> Z-AXIS MOVEMENT
                             </div>
                             <div class="button-group">
                                 <button class="control-btn" id="z-minus">
-                                    <i>↙️</i> DECREASE Z
+                                    <i class="fas fa-arrow-down-left"></i> DECREASE Z
                                 </button>
                                 <button class="control-btn" id="z-plus">
-                                    <i>↗️</i> INCREASE Z
+                                    <i class="fas fa-arrow-up-right"></i> INCREASE Z
                                 </button>
                             </div>
                         </div>
                         
                         <button class="control-btn fire-btn" id="fire-laser">
-                            <i>🔴</i> FIRE LASER
+                            <i class="fas fa-crosshairs"></i> FIRE LASER
                         </button>
                     </div>
                     
                     <div class="panel-title" style="margin-top: 30px;">
-                        <i>⚙️</i> SYSTEM SETTINGS
+                        <i class="fas fa-cog"></i> SYSTEM SETTINGS
                     </div>
                     
                     <div class="settings">
@@ -359,7 +362,7 @@
             <div class="right-panel">
                 <div class="panel">
                     <div class="panel-title">
-                        <i>📹</i> ROBOT CAMERA FEED
+                        <i class="fas fa-video"></i> ROBOT CAMERA FEED
                     </div>
                     
                     <div class="camera-feed">
@@ -392,6 +395,69 @@
     </div>
 
     <script>
+        let ws;
+        const systemStatusDot = document.querySelector('.status-bar .status-item:nth-child(1) .status-dot');
+        const systemStatusText = document.querySelector('.status-bar .status-item:nth-child(1) span');
+        const laserStatusDot = document.querySelector('.status-bar .status-item:nth-child(2) .status-dot');
+        const laserStatusText = document.querySelector('.status-bar .status-item:nth-child(2) span');
+        const cameraFeedDiv = document.querySelector('.camera-feed');
+
+        function connectWebSocket() {
+            ws = new WebSocket('ws://localhost:8000/ws');
+
+            ws.onopen = () => {
+                console.log('WebSocket connection established.');
+                systemStatusDot.style.backgroundColor = 'var(--primary-green)';
+                systemStatusDot.style.boxShadow = 'var(--glow)';
+                systemStatusText.textContent = 'SYSTEM: ONLINE';
+            };
+
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                if (message.type === 'camera_frame') {
+                    let img = cameraFeedDiv.querySelector('img');
+                    if (!img) {
+                        cameraFeedDiv.innerHTML = ''; // Clear placeholder
+                        img = document.createElement('img');
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'cover';
+                        cameraFeedDiv.appendChild(img);
+                    }
+                    img.src = `data:image/jpeg;base64,${message.data}`;
+                } else if (message.type === 'laser_state') {
+                    if (message.state === 'armed') {
+                        laserStatusDot.style.backgroundColor = 'red';
+                        laserStatusDot.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.7)';
+                        laserStatusText.textContent = 'LASER: ARMED';
+                    } else {
+                        laserStatusDot.style.backgroundColor = 'var(--primary-green)';
+                        laserStatusDot.style.boxShadow = 'var(--glow)';
+                        laserStatusText.textContent = 'LASER: SAFE';
+                    }
+                }
+                console.log('Message from backend:', message);
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                systemStatusDot.style.backgroundColor = 'red';
+                systemStatusDot.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.7)';
+                systemStatusText.textContent = 'SYSTEM: OFFLINE';
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket connection closed. Attempting to reconnect...');
+                systemStatusDot.style.backgroundColor = 'red';
+                systemStatusDot.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.7)';
+                systemStatusText.textContent = 'SYSTEM: OFFLINE';
+                setTimeout(connectWebSocket, 3000); // Attempt to reconnect after 3 seconds
+            };
+        }
+
+        // Initial WebSocket connection
+        connectWebSocket();
+
         // Movement control buttons
         document.getElementById('x-minus').addEventListener('click', () => moveAxis('x', -1));
         document.getElementById('x-plus').addEventListener('click', () => moveAxis('x', 1));
@@ -402,14 +468,76 @@
         
         // Fire laser button
         document.getElementById('fire-laser').addEventListener('click', fireLaser);
+
+        // ARM/DISARM LASER button
+        const armDisarmButton = document.createElement('button');
+        armDisarmButton.className = 'control-btn fire-btn';
+        armDisarmButton.id = 'arm-disarm-laser';
+        armDisarmButton.innerHTML = '<i class="fas fa-shield-alt"></i> ARM LASER';
+        document.querySelector('.settings').prepend(armDisarmButton); // Add before other settings
+
+        let laserArmed = false;
+        armDisarmButton.addEventListener('click', async () => {
+            const newState = laserArmed ? 'safe' : 'armed';
+            try {
+                const response = await fetch('/config/laser/state', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ state: newState })
+                });
+                if (response.ok) {
+                    laserArmed = !laserArmed;
+                    armDisarmButton.innerHTML = laserArmed ? '<i class="fas fa-shield-alt"></i> DISARM LASER' : '<i class="fas fa-shield-alt"></i> ARM LASER';
+                    // The WebSocket onmessage handler will update the status bar
+                } else {
+                    console.error('Failed to change laser state:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error changing laser state:', error);
+            }
+        });
         
         // Change settings buttons
         document.getElementById('change-speed').addEventListener('click', changeSpeed);
         document.getElementById('change-acceleration').addEventListener('click', changeAcceleration);
+
+        // Fetch initial configuration values on page load
+        async function fetchInitialConfig() {
+            try {
+                const speedResponse = await fetch('/config/laser/speed');
+                const speedData = await speedResponse.json();
+                document.getElementById('max-speed').value = speedData.value;
+
+                const accResponse = await fetch('/config/laser/acceleration');
+                const accData = await accResponse.json();
+                document.getElementById('acceleration').value = accData.value;
+
+                const laserStateResponse = await fetch('/config/laser/state');
+                const laserStateData = await laserStateResponse.json();
+                laserArmed = (laserStateData.state === 'armed');
+                armDisarmButton.innerHTML = laserArmed ? '<i class="fas fa-shield-alt"></i> DISARM LASER' : '<i class="fas fa-shield-alt"></i> ARM LASER';
+                // The WebSocket onmessage handler will update the status bar based on initial state
+            } catch (error) {
+                console.error('Error fetching initial configuration:', error);
+            }
+        }
+        fetchInitialConfig();
         
         function moveAxis(axis, direction) {
             console.log(`Moving ${axis.toUpperCase()}-axis in direction: ${direction > 0 ? '+' : '-'}`);
-            // In a real implementation, this would send a command to the robot
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'laser',
+                    component: 'movement',
+                    axis: axis,
+                    direction: direction,
+                    mode: 'step'
+                }));
+            } else {
+                console.error('WebSocket not connected for movement control.');
+            }
         }
         
         function fireLaser() {
@@ -419,10 +547,19 @@
             setTimeout(() => {
                 fireBtn.classList.remove('laser-active');
             }, 500);
-            // In a real implementation, this would trigger the laser
+
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'laser',
+                    component: 'firing',
+                    action: 'activate'
+                }));
+            } else {
+                console.error('WebSocket not connected for laser firing.');
+            }
         }
         
-        function changeSpeed() {
+        async function changeSpeed() {
             const speedInput = document.getElementById('max-speed');
             const speed = parseFloat(speedInput.value);
             
@@ -432,10 +569,23 @@
             }
             
             console.log(`Changing max speed to: ${speed}`);
-            // In a real implementation, this would update the robot's speed setting
+            try {
+                const response = await fetch('/config/laser/speed', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ value: speed })
+                });
+                if (!response.ok) {
+                    console.error('Failed to change speed:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error changing speed:', error);
+            }
         }
         
-        function changeAcceleration() {
+        async function changeAcceleration() {
             const accInput = document.getElementById('acceleration');
             const acceleration = parseFloat(accInput.value);
             
@@ -445,14 +595,21 @@
             }
             
             console.log(`Changing acceleration to: ${acceleration}`);
-            // In a real implementation, this would update the robot's acceleration setting
+            try {
+                const response = await fetch('/config/laser/acceleration', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ value: acceleration })
+                });
+                if (!response.ok) {
+                    console.error('Failed to change acceleration:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error changing acceleration:', error);
+            }
         }
-        
-        // Simulate camera feed initialization
-        setTimeout(() => {
-            const cameraPlaceholder = document.querySelector('.camera-placeholder');
-            cameraPlaceholder.innerHTML = '<div>CAMERA FEED ACTIVE</div><div style="font-size:0.8rem;margin-top:10px;">LIVE STREAMING</div>';
-        }, 2000);
     </script>
 </body>
 </html>

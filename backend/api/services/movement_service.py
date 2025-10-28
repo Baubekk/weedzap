@@ -1,24 +1,23 @@
-from backend.api.internal.ac_framework import component
-from backend.api.main import weedzap
-from backend.api.services.config_service import ConfigService, MovementMode
-from backend.api.services.handler_service import HandlerService
-from backend.api.services.websocket_service import WebsocketService
+from ..internal.ac_framework import component, inject
+from .config_service import ConfigService, MovementMode
+from .handler_service import HandlerService
+from .websocket_service import WebsocketService
 
-@component(weedzap)
+@component
 class MovementService(HandlerService):
-    def __init__(self):
+    def __init__(self, config_service: ConfigService = inject(ConfigService)):
         self.current = None
         self.queued = None
-        self.get_config_service = lambda: weedzap.get_context().get_component(ConfigService)
+        self.config_service = config_service
 
     async def handle(self, data: dict):
         movement_mode = MovementMode(data.get("mode"))
         if movement_mode == MovementMode.HOLD:
-            if self.get_config_service().get_movement_mode() != MovementMode.HOLD:
+            if self.config_service.get_movement_mode() != MovementMode.HOLD:
                 return {"error": "Movement mode is not hold. Change to hold mode first. POST /config/movement-mode with body { \"movement_mode\": \"hold\" }"}
             await self.hold(data.get("data"))
         elif movement_mode == MovementMode.STEP:
-            if self.get_config_service().get_movement_mode() != MovementMode.STEP:
+            if self.config_service.get_movement_mode() != MovementMode.STEP:
                 return {"error": "Movement mode is not step. Change to step mode first. POST /config/movement-mode with body { \"movement_mode\": \"step\" }"}
             await self.step(data.get("data"))
 

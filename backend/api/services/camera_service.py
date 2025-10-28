@@ -3,13 +3,12 @@
 import cv2
 import base64
 import asyncio
-from backend.api.internal.ac_framework import component
-from backend.api.main import weedzap
-from backend.api.services.websocket_service import WebsocketService
+from ..internal.ac_framework import component, inject
+from .websocket_service import WebsocketService
 
-@component(weedzap)
+@component
 class CameraService:
-    def __init__(self, websocket_service: WebsocketService):
+    def __init__(self, websocket_service: WebsocketService = inject(WebsocketService)):
         self.websocket_service = websocket_service
         self._camera_active = False
         self._camera_task = None

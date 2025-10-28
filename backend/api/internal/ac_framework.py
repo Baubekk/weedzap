@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends, Request
 
 
 class ApplicationContext:
@@ -22,16 +22,13 @@ class App:
     def get_context(self):
         return self.__context
 
-def component(app: App):
-    def wrapper(cls):
-        instance = cls()
-        app.get_context().add_component(instance)
-        cls.get_context = lambda: app.get_context()
-        cls.__is_component = lambda: True
-        cls.get_instance = lambda: instance
-        return cls
-    return wrapper
+def component(cls):
+    cls.__is_component = lambda: True
+    return cls
 
-def inject(app: App, cls):
-    return Depends(lambda: app.get_context().get_component(cls))
+def inject(cls):
+    def _get_component(request: Request):
+        app: App = request.app.state.weedzap_app
+        return app.get_context().get_component(cls)
+    return Depends(_get_component)
 
