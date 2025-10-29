@@ -13,7 +13,7 @@ class LaserState(Enum):
 
 @component
 class ConfigService:
-    def __init__(self, arduino_service: ArduinoService = inject(ArduinoService)):
+    def __init__(self, arduino_service: ArduinoService):
         self.__config = {}
         self.set_movement_mode(MovementMode.HOLD)
         self.set_speed(1000)

@@ -1,6 +1,6 @@
 from fastapi import WebSocket, WebSocketDisconnect
 import asyncio
-from ..internal.ac_framework import component, inject
+from ..internal.ac_framework import component
 
 @component
 class WebsocketService:
@@ -9,12 +9,11 @@ class WebsocketService:
         self.lock = asyncio.Lock()
 
     async def connect(self, websocket: WebSocket) -> bool:
-        raise Exception("suka")
         async with self.lock:
             if self.active_connection is not None:
                 return False
+            await websocket.accept()
             self.active_connection = websocket
-            websocket.accept()
             return True
 
     async def disconnect(self):

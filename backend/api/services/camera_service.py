@@ -4,11 +4,11 @@ import cv2
 import base64
 import asyncio
 from ..internal.ac_framework import component, inject
-from .websocket_service import WebsocketService
+from .singleton_websocket_service import WebsocketService
 
 @component
 class CameraService:
-    def __init__(self, websocket_service: WebsocketService = inject(WebsocketService)):
+    def __init__(self, websocket_service: WebsocketService):
         self.websocket_service = websocket_service
         self._camera_active = False
         self._camera_task = None

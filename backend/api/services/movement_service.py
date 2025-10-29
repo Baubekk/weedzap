@@ -1,11 +1,10 @@
 from ..internal.ac_framework import component, inject
 from .config_service import ConfigService, MovementMode
 from .handler_service import HandlerService
-from .websocket_service import WebsocketService
 
 @component
 class MovementService(HandlerService):
-    def __init__(self, config_service: ConfigService = inject(ConfigService)):
+    def __init__(self, config_service: ConfigService):
         self.current = None
         self.queued = None
         self.config_service = config_service

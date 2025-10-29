@@ -11,7 +11,7 @@ class LaserComponent(Enum):
 #fuck the variable naming in this class (i did it myself)
 @component
 class LaserService(HandlerService):
-    def __init__(self, config_service: ConfigService = inject(ConfigService), arduino_service: ArduinoService = inject(ArduinoService)):
+    def __init__(self, config_service: ConfigService, arduino_service: ArduinoService):
         self.config_service = config_service
         self.arduino_service = arduino_service
 

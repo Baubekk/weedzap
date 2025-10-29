@@ -1,4 +1,5 @@
-from fastapi import Depends, Request
+from fastapi import Depends
+from fastapi import Request, WebSocket
 
 
 class ApplicationContext:
@@ -27,8 +28,11 @@ def component(cls):
     return cls
 
 def inject(cls):
-    def _get_component(request: Request):
-        app: App = request.app.state.weedzap_app
+    async def _get_component(request: Request):
+        app = (request).app.state.weedzap_app
         return app.get_context().get_component(cls)
+
+    _get_component.__signature__ = None
+
     return Depends(_get_component)
 

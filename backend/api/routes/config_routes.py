@@ -7,15 +7,12 @@ from ..internal.ac_framework import inject
 router = APIRouter()
 
 class Config(BaseModel):
-    speed: float = Field(ge=0, le=10)
+    speed: float = Field(ge=0, le=10000)
     movement_mode: MovementMode
 
-@router.get("/config")
+@router.get("/config", response_model=Config)
 async def get_config(config_service: ConfigService = inject(ConfigService)):
-    return {
-        "speed": config_service.get_speed(),
-        "movement_mode": config_service.get_movement_mode()
-    }
+    return Config(speed=config_service.get_speed(), movement_mode=config_service.get_movement_mode())
 
 @router.post("/config")
 async def set_config(config: Config, config_service: ConfigService = inject(ConfigService)):

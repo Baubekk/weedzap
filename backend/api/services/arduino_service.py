@@ -1,7 +1,7 @@
 import threading
 import serial
 import time
-from ..internal.ac_framework import component, inject
+from ..internal.ac_framework import component
 
 @component
 class ArduinoService:
@@ -10,7 +10,7 @@ class ArduinoService:
         self.serial = None
         self._stop = False
         self.thread = threading.Thread(target=self._connection_loop, daemon=True)
-        self.baudrate = 9600 # Assuming a default baudrate, adjust if necessary
+        self.baudrate = 9600
 
     def start(self):
         self.thread.start()

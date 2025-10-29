@@ -3,22 +3,19 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from ..services.handler_service import HandlerService
 from ..services.laser_service import LaserService
 from ..services.movement_service import MovementService
-from ..services.websocket_service import WebsocketService
+from ..services.singleton_websocket_service import WebsocketService
 from ..services.camera_service import CameraService
 from ..internal.ac_framework import inject
 
-router = APIRouter()
+from ..services.services import websocket_service, laser_service, movement_service, camera_service
 
+router = APIRouter()
 
 handler_services: Dict[str, HandlerService] = {}
 
 @router.websocket("/ws")
 async def websocket_endpoint(
-    websocket: WebSocket,
-    websocket_service: WebsocketService = inject(WebsocketService),
-    laser_service: LaserService = inject(LaserService),
-    movement_service: MovementService = inject(MovementService),
-    camera_service: CameraService = inject(CameraService)
+    websocket: WebSocket
 ):
     await websocket_service.connect(websocket)
     print(f"Client connected: {websocket.client}")
@@ -39,6 +36,7 @@ async def websocket_endpoint(
                     await websocket.send_json(response)
             
     except WebSocketDisconnect:
+        await websocket_service.disconnect()
         print(f"Client disconnected: {websocket.client}")
     except Exception as e:
         print(f"WebSocket error: {e}")
