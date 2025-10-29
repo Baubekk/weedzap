@@ -85,24 +85,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function sendConfigUpdate(endpoint, body) {
-        try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(body)
-            });
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            logMessage(`Successfully updated ${endpoint.split('/').pop()}.`);
-            fetchCurrentConfig(); // Refresh displayed config
-        } catch (error) {
-            logMessage(`Error updating config for ${endpoint}: ${error}`, 'error');
+async function sendConfigUpdate(endpoint, body) {
+    try {
+        let headers = {}; // Initialize headers as an empty object
+        let requestBody;
+
+        if (endpoint === 'movement-mode' || endpoint === 'state') {
+            // For these specific endpoints, send a JSON string literal with application/json
+            requestBody = JSON.stringify(body); // e.g., JSON.stringify("hold") -> '"hold"'
+            headers = { 'Content-Type': 'application/json' }; // Explicitly set headers here
+        } else if (typeof body === 'object' && body !== null) {
+            // For other object bodies, stringify and set application/json
+            requestBody = JSON.stringify(body);
+            headers = { 'Content-Type': 'application/json' }; // Explicitly set headers here
+        } else {
+            // Fallback for any other raw string bodies (if applicable), though not expected for current config
+            requestBody = body;
+            headers = { 'Content-Type': 'text/plain' }; // Explicitly set headers here
         }
+
+        const response = await fetch(`/config/laser/${endpoint}`, {
+            method: 'POST',
+            headers: headers,
+            body: requestBody
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+
+        console.log(`${endpoint} updated successfully.`);
+        fetchCurrentConfig(); // Refresh config after update
+    } catch (error) {
+        console.error(`Error updating ${endpoint}:`, error);
     }
+}
 
     // Event Listeners for Configuration Controls
     btnSetSpeed.addEventListener('click', () => {
@@ -123,14 +141,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    btnSetMovementMode.addEventListener('click', () => {
+    btnSetMovementMode.addEventListener('click', async () => {
         const mode = setMovementModeSelect.value;
-        sendConfigUpdate('/config/laser/movement-mode', { laser_movement_mode: mode });
+        await sendConfigUpdate('movement-mode', mode); // Pass raw string
     });
 
     btnSetLaserState.addEventListener('click', () => {
         const state = setLaserStateSelect.value;
-        sendConfigUpdate('/config/laser/state', { laser_state: state });
+        sendConfigUpdate('state', state);
     });
 
     // Event Listeners for Movement Controls (Websocket)
