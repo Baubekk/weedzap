@@ -126,7 +126,7 @@ async function sendConfigUpdate(endpoint, body) {
     btnSetSpeed.addEventListener('click', () => {
         const speed = parseFloat(setSpeedInput.value);
         if (!isNaN(speed) && speed >= 0 && speed <= 10000) {
-            sendConfigUpdate('/config/laser/speed', { laser_speed: speed });
+            sendConfigUpdate('speed', speed);
         } else {
             logMessage('Invalid speed value. Must be between 0 and 10000.', 'error');
         }
@@ -135,7 +135,7 @@ async function sendConfigUpdate(endpoint, body) {
     btnSetAcceleration.addEventListener('click', () => {
         const acceleration = parseFloat(setAccelerationInput.value);
         if (!isNaN(acceleration) && acceleration >= 0 && acceleration <= 10000) {
-            sendConfigUpdate('/config/laser/acceleration', { laser_acceleration: acceleration });
+            sendConfigUpdate('acceleration', acceleration);
         } else {
             logMessage('Invalid acceleration value. Must be between 0 and 10000.', 'error');
         }
