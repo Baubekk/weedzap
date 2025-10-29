@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1a1a1a; /* Dark background */
+    color: #e0e0e0; /* Light text */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.container {
+    background-color: #2a2a2a; /* Slightly lighter dark for container */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 800px;
+}
+
+h1, h2, h3 {
+    color: #4CAF50; /* Green accent for headings */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+section:last-child {
+    border-bottom: none;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+label {
+    min-width: 120px;
+    font-weight: bold;
+}
+
+input[type="number"], select {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #4CAF50; /* Green border */
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #4CAF50; /* Green button */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #5cb85c; /* Lighter green on hover */
+}
+
+.current-config p {
+    margin: 5px 0;
+    padding-left: 10px;
+}
+
+.movement-controls div {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.status-log #log-output {
+    background-color: #3a3a3a;
+    border: 1px solid #4CAF50;
+    padding: 10px;
+    height: 150px;
+    overflow-y: scroll;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    color: #b0b0b0;
+}

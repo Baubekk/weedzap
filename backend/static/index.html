@@ -3,611 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Laser Control</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-        :root {
-            --primary-green: #00ff9d;
-            --secondary-green: #00cc7a;
-            --dark-bg: #0a0a0a;
-            --panel-bg: rgba(0, 255, 157, 0.05);
-            --panel-border: rgba(0, 255, 157, 0.2);
-            --text-color: #e0e0e0;
-            --glow: 0 0 10px rgba(0, 255, 157, 0.7);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        body {
-            background-color: var(--dark-bg);
-            color: var(--text-color);
-            min-height: 100vh;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.05) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(0, 255, 157, 0.05) 0%, transparent 20%);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            border-bottom: 1px solid var(--panel-border);
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: var(--primary-green);
-            text-shadow: var(--glow);
-            letter-spacing: 2px;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.8;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .panel {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-        }
-
-        .panel-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: var(--primary-green);
-            display: flex;
-            align-items: center;
-        }
-
-        .panel-title i {
-            margin-right: 10px;
-        }
-
-        .control-section {
-            margin-bottom: 30px;
-        }
-
-        .axis-control {
-            margin-bottom: 25px;
-        }
-
-        .axis-label {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .axis-label i {
-            margin-right: 8px;
-            color: var(--primary-green);
-        }
-
-        .button-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .control-btn {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--panel-border);
-            color: var(--text-color);
-            padding: 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .control-btn:hover {
-            background: rgba(0, 255, 157, 0.1);
-            border-color: var(--primary-green);
-            box-shadow: var(--glow);
-        }
-
-        .control-btn:active {
-            transform: scale(0.98);
-        }
-
-        .control-btn i {
-            margin-right: 8px;
-        }
-
-        .fire-btn {
-            background: rgba(255, 0, 0, 0.2);
-            border: 1px solid rgba(255, 50, 50, 0.5);
-            color: #ff5555;
-            padding: 15px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        .fire-btn:hover {
-            background: rgba(255, 0, 0, 0.3);
-            border-color: #ff5555;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
-        }
-
-        .settings {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .setting-group {
-            margin-bottom: 15px;
-        }
-
-        .setting-label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        .setting-input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--panel-border);
-            color: var(--text-color);
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 8px;
-        }
-
-        .setting-input:focus {
-            outline: none;
-            border-color: var(--primary-green);
-            box-shadow: var(--glow);
-        }
-
-        .change-btn {
-            background: rgba(0, 255, 157, 0.1);
-            border: 1px solid var(--primary-green);
-            color: var(--primary-green);
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .change-btn:hover {
-            background: rgba(0, 255, 157, 0.2);
-            box-shadow: var(--glow);
-        }
-
-        .camera-feed {
-            width: 100%;
-            height: 300px;
-            background: #000;
-            border-radius: 5px;
-            overflow: hidden;
-            position: relative;
-            border: 1px solid var(--panel-border);
-        }
-
-        .camera-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(45deg, #0a0a0a, #1a1a1a);
-            color: var(--text-color);
-            opacity: 0.7;
-        }
-
-        .status-bar {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 5px;
-            border: 1px solid var(--panel-border);
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--primary-green);
-            margin-right: 8px;
-            box-shadow: var(--glow);
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-            border-top: 1px solid var(--panel-border);
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-
-        /* Animation for the laser firing */
-        @keyframes laserFire {
-            0% { opacity: 0; }
-            50% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        .laser-active {
-            animation: laserFire 0.5s ease;
-        }
-    </style>
+    <title>Laser Control Panel</title>
+    <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>WEEDZAP LASER CONTROL</h1>
-            <div class="subtitle">3-Axis Precision Laser System</div>
-        </header>
+        <h1>Laser Control Panel</h1>
 
-        <div class="main-content">
-            <div class="left-panel">
-                <div class="panel">
-                    <div class="panel-title">
-                        <i class="fas fa-compass"></i> MOVEMENT CONTROL
-                    </div>
-                    
-                    <div class="control-section">
-                        <div class="axis-control">
-                            <div class="axis-label">
-                                <i class="fas fa-arrows-alt-v"></i> X-AXIS MOVEMENT
-                            </div>
-                            <div class="button-group">
-                                <button class="control-btn" id="x-minus">
-                                    <i class="fas fa-arrow-left"></i> DECREASE X
-                                </button>
-                                <button class="control-btn" id="x-plus">
-                                    <i class="fas fa-arrow-right"></i> INCREASE X
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="axis-control">
-                            <div class="axis-label">
-                                <i class="fas fa-arrows-alt-h"></i> Y-AXIS MOVEMENT
-                            </div>
-                            <div class="button-group">
-                                <button class="control-btn" id="y-minus">
-                                    <i class="fas fa-arrow-down"></i> DECREASE Y
-                                </button>
-                                <button class="control-btn" id="y-plus">
-                                    <i class="fas fa-arrow-up"></i> INCREASE Y
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="axis-control">
-                            <div class="axis-label">
-                                <i class="fas fa-sync-alt"></i> Z-AXIS MOVEMENT
-                            </div>
-                            <div class="button-group">
-                                <button class="control-btn" id="z-minus">
-                                    <i class="fas fa-arrow-down-left"></i> DECREASE Z
-                                </button>
-                                <button class="control-btn" id="z-plus">
-                                    <i class="fas fa-arrow-up-right"></i> INCREASE Z
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <button class="control-btn fire-btn" id="fire-laser">
-                            <i class="fas fa-crosshairs"></i> FIRE LASER
-                        </button>
-                    </div>
-                    
-                    <div class="panel-title" style="margin-top: 30px;">
-                        <i class="fas fa-cog"></i> SYSTEM SETTINGS
-                    </div>
-                    
-                    <div class="settings">
-                        <div class="setting-group">
-                            <label class="setting-label">MAX SPEED (1-10)</label>
-                            <input type="number" class="setting-input" id="max-speed" min="1" max="10" step="0.1" value="5.0">
-                            <button class="change-btn" id="change-speed">CHANGE SPEED</button>
-                        </div>
-                        
-                        <div class="setting-group">
-                            <label class="setting-label">ACCELERATION (0-100)</label>
-                            <input type="number" class="setting-input" id="acceleration" min="0" max="100" step="0.1" value="50.0">
-                            <button class="change-btn" id="change-acceleration">CHANGE ACCELERATION</button>
-                        </div>
-                    </div>
-                </div>
+        <section class="current-config">
+            <h2>Current Configuration</h2>
+            <p>Speed: <span id="current-speed">N/A</span></p>
+            <p>Acceleration: <span id="current-acceleration">N/A</span></p>
+            <p>Movement Mode: <span id="current-movement-mode">N/A</span></p>
+            <p>Laser State: <span id="current-laser-state">N/A</span></p>
+        </section>
+
+        <section class="config-controls">
+            <h2>Set Configuration</h2>
+            <div class="control-group">
+                <label for="set-speed">Speed (0-10000):</label>
+                <input type="number" id="set-speed" min="0" max="10000" step="any" value="1000">
+                <button id="btn-set-speed">Set Speed</button>
             </div>
-            
-            <div class="right-panel">
-                <div class="panel">
-                    <div class="panel-title">
-                        <i class="fas fa-video"></i> ROBOT CAMERA FEED
-                    </div>
-                    
-                    <div class="camera-feed">
-                        <div class="camera-placeholder">
-                            <div>CAMERA FEED INITIALIZING...</div>
-                        </div>
-                    </div>
-                    
-                    <div class="status-bar">
-                        <div class="status-item">
-                            <div class="status-dot"></div>
-                            <span>SYSTEM: ONLINE</span>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-dot"></div>
-                            <span>LASER: READY</span>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-dot"></div>
-                            <span>CONNECTION: STABLE</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="control-group">
+                <label for="set-acceleration">Acceleration (0-10000):</label>
+                <input type="number" id="set-acceleration" min="0" max="10000" step="any" value="1000">
+                <button id="btn-set-acceleration">Set Acceleration</button>
             </div>
-        </div>
-        
-        <footer>
-            Quantum Laser Control System v2.1 | Secure Connection Established
-        </footer>
+            <div class="control-group">
+                <label for="set-movement-mode">Movement Mode:</label>
+                <select id="set-movement-mode">
+                    <option value="hold">Hold</option>
+                    <option value="step">Step</option>
+                </select>
+                <button id="btn-set-movement-mode">Set Mode</button>
+            </div>
+            <div class="control-group">
+                <label for="set-laser-state">Laser State:</label>
+                <select id="set-laser-state">
+                    <option value="safe">Safe</option>
+                    <option value="armed">Armed</option>
+                </select>
+                <button id="btn-set-laser-state">Set State</button>
+            </div>
+        </section>
+
+        <section class="movement-controls">
+            <h2>Movement Controls</h2>
+            <div class="hold-movement">
+                <h3>Hold Movement</h3>
+                <button class="btn-hold" data-axis="x" data-positive="true">X+</button>
+                <button class="btn-hold" data-axis="x" data-positive="false">X-</button>
+                <button class="btn-hold" data-axis="y" data-positive="true">Y+</button>
+                <button class="btn-hold" data-axis="y" data-positive="false">Y-</button>
+                <button class="btn-hold" data-axis="z" data-positive="true">Z+</button>
+                <button class="btn-hold" data-axis="z" data-positive="false">Z-</button>
+            </div>
+            <div class="step-movement">
+                <h3>Step Movement</h3>
+                <label for="step-value">Step Value:</label>
+                <input type="number" id="step-value" value="10">
+                <button class="btn-step" data-axis="x">Step X</button>
+                <button class="btn-step" data-axis="y">Step Y</button>
+                <button class="btn-step" data-axis="z">Step Z</button>
+            </div>
+        </section>
+
+        <section class="firing-control">
+            <h2>Laser Firing</h2>
+            <button id="btn-fire-laser">Fire Laser (Toggle)</button>
+        </section>
+
+        <section class="camera-feed">
+            <h2>Camera Feed</h2>
+            <img id="cameraFeed" src="" alt="Camera Feed">
+        </section>
+
+        <section class="status-log">
+            <h2>Status Log</h2>
+            <p>Websocket Status: <span id="ws-status">Disconnected</span></p>
+            <div id="log-output"></div>
+        </section>
     </div>
 
-    <script>
-        let ws;
-        const systemStatusDot = document.querySelector('.status-bar .status-item:nth-child(1) .status-dot');
-        const systemStatusText = document.querySelector('.status-bar .status-item:nth-child(1) span');
-        const laserStatusDot = document.querySelector('.status-bar .status-item:nth-child(2) .status-dot');
-        const laserStatusText = document.querySelector('.status-bar .status-item:nth-child(2) span');
-        const cameraFeedDiv = document.querySelector('.camera-feed');
-
-        function connectWebSocket() {
-            ws = new WebSocket('ws://localhost:8000/ws');
-
-            ws.onopen = () => {
-                console.log('WebSocket connection established.');
-                systemStatusDot.style.backgroundColor = 'var(--primary-green)';
-                systemStatusDot.style.boxShadow = 'var(--glow)';
-                systemStatusText.textContent = 'SYSTEM: ONLINE';
-            };
-
-            ws.onmessage = (event) => {
-                const message = JSON.parse(event.data);
-                if (message.type === 'camera_frame') {
-                    let img = cameraFeedDiv.querySelector('img');
-                    if (!img) {
-                        cameraFeedDiv.innerHTML = ''; // Clear placeholder
-                        img = document.createElement('img');
-                        img.style.width = '100%';
-                        img.style.height = '100%';
-                        img.style.objectFit = 'cover';
-                        cameraFeedDiv.appendChild(img);
-                    }
-                    img.src = `data:image/jpeg;base64,${message.data}`;
-                } else if (message.type === 'laser_state') {
-                    if (message.state === 'armed') {
-                        laserStatusDot.style.backgroundColor = 'red';
-                        laserStatusDot.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.7)';
-                        laserStatusText.textContent = 'LASER: ARMED';
-                    } else {
-                        laserStatusDot.style.backgroundColor = 'var(--primary-green)';
-                        laserStatusDot.style.boxShadow = 'var(--glow)';
-                        laserStatusText.textContent = 'LASER: SAFE';
-                    }
-                }
-            };
-
-            ws.onerror = (error) => {
-                console.error('WebSocket error:', error);
-                systemStatusDot.style.backgroundColor = 'red';
-                systemStatusDot.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.7)';
-                systemStatusText.textContent = 'SYSTEM: OFFLINE';
-            };
-
-            ws.onclose = () => {
-                console.log('WebSocket connection closed. Attempting to reconnect...');
-                systemStatusDot.style.backgroundColor = 'red';
-                systemStatusDot.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.7)';
-                systemStatusText.textContent = 'SYSTEM: OFFLINE';
-                setTimeout(connectWebSocket, 3000); // Attempt to reconnect after 3 seconds
-            };
-        }
-
-        // Initial WebSocket connection
-        connectWebSocket();
-
-        // Movement control buttons
-        document.getElementById('x-minus').addEventListener('click', () => moveAxis('x', -1));
-        document.getElementById('x-plus').addEventListener('click', () => moveAxis('x', 1));
-        document.getElementById('y-minus').addEventListener('click', () => moveAxis('y', -1));
-        document.getElementById('y-plus').addEventListener('click', () => moveAxis('y', 1));
-        document.getElementById('z-minus').addEventListener('click', () => moveAxis('z', -1));
-        document.getElementById('z-plus').addEventListener('click', () => moveAxis('z', 1));
-        
-        // Fire laser button
-        document.getElementById('fire-laser').addEventListener('click', fireLaser);
-
-        // ARM/DISARM LASER button
-        const armDisarmButton = document.createElement('button');
-        armDisarmButton.className = 'control-btn fire-btn';
-        armDisarmButton.id = 'arm-disarm-laser';
-        armDisarmButton.innerHTML = '<i class="fas fa-shield-alt"></i> ARM LASER';
-        document.querySelector('.settings').prepend(armDisarmButton); // Add before other settings
-
-        let laserArmed = false;
-        armDisarmButton.addEventListener('click', async () => {
-            const newState = laserArmed ? 'safe' : 'armed';
-            try {
-                const response = await fetch('/config/laser/state', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ state: newState })
-                });
-                if (response.ok) {
-                    laserArmed = !laserArmed;
-                    armDisarmButton.innerHTML = laserArmed ? '<i class="fas fa-shield-alt"></i> DISARM LASER' : '<i class="fas fa-shield-alt"></i> ARM LASER';
-                    // The WebSocket onmessage handler will update the status bar
-                } else {
-                    console.error('Failed to change laser state:', response.statusText);
-                }
-            } catch (error) {
-                console.error('Error changing laser state:', error);
-            }
-        });
-        
-        // Change settings buttons
-        document.getElementById('change-speed').addEventListener('click', changeSpeed);
-        document.getElementById('change-acceleration').addEventListener('click', changeAcceleration);
-
-        // Fetch initial configuration values on page load
-        async function fetchInitialConfig() {
-            try {
-                const speedResponse = await fetch('/config/laser/speed');
-                const speedData = await speedResponse.json();
-                document.getElementById('max-speed').value = speedData.value;
-
-                const accResponse = await fetch('/config/laser/acceleration');
-                const accData = await accResponse.json();
-                document.getElementById('acceleration').value = accData.value;
-
-                const laserStateResponse = await fetch('/config/laser/state');
-                const laserStateData = await laserStateResponse.json();
-                laserArmed = (laserStateData.state === 'armed');
-                armDisarmButton.innerHTML = laserArmed ? '<i class="fas fa-shield-alt"></i> DISARM LASER' : '<i class="fas fa-shield-alt"></i> ARM LASER';
-                // The WebSocket onmessage handler will update the status bar based on initial state
-            } catch (error) {
-                console.error('Error fetching initial configuration:', error);
-            }
-        }
-        fetchInitialConfig();
-        
-        function moveAxis(axis, direction) {
-            console.log(`Moving ${axis.toUpperCase()}-axis in direction: ${direction > 0 ? '+' : '-'}`);
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({
-                    type: 'laser',
-                    component: 'movement',
-                    axis: axis,
-                    direction: direction,
-                    mode: 'step'
-                }));
-            } else {
-                console.error('WebSocket not connected for movement control.');
-            }
-        }
-        
-        function fireLaser() {
-            console.log("Firing laser!");
-            const fireBtn = document.getElementById('fire-laser');
-            fireBtn.classList.add('laser-active');
-            setTimeout(() => {
-                fireBtn.classList.remove('laser-active');
-            }, 500);
-
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({
-                    type: 'laser',
-                    component: 'firing',
-                    action: 'activate'
-                }));
-            } else {
-                console.error('WebSocket not connected for laser firing.');
-            }
-        }
-        
-        async function changeSpeed() {
-            const speedInput = document.getElementById('max-speed');
-            const speed = parseFloat(speedInput.value);
-            
-            if (isNaN(speed) || speed < 1 || speed > 10) {
-                alert("Please enter a valid speed between 1 and 10");
-                return;
-            }
-            
-            console.log(`Changing max speed to: ${speed}`);
-            try {
-                const response = await fetch('/config/laser/speed', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ value: speed })
-                });
-                if (!response.ok) {
-                    console.error('Failed to change speed:', response.statusText);
-                }
-            } catch (error) {
-                console.error('Error changing speed:', error);
-            }
-        }
-        
-        async function changeAcceleration() {
-            const accInput = document.getElementById('acceleration');
-            const acceleration = parseFloat(accInput.value);
-            
-            if (isNaN(acceleration) || acceleration < 0 || acceleration > 100) {
-                alert("Please enter a valid acceleration between 0 and 100");
-                return;
-            }
-            
-            console.log(`Changing acceleration to: ${acceleration}`);
-            try {
-                const response = await fetch('/config/laser/acceleration', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ value: acceleration })
-                });
-                if (!response.ok) {
-                    console.error('Failed to change acceleration:', response.statusText);
-                }
-            } catch (error) {
-                console.error('Error changing acceleration:', error);
-            }
-        }
-    </script>
+    <script src="static/script.js"></script>
 </body>
 </html>
