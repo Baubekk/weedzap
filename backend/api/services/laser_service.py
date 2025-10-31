@@ -57,7 +57,7 @@ class LaserService(HandlerService):
         else:
             msg += "0"
 
-        await self.arduino_service.send(msg)
+        self.arduino_service.send(msg)
             
 
     async def step(self, data: dict):
@@ -70,4 +70,4 @@ class LaserService(HandlerService):
 
         msg = f"{axis}s {value}"
 
-        await self.arduino_service.send(msg)
+        self.arduino_service.send(msg)

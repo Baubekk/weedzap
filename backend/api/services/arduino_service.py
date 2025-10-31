@@ -1,5 +1,5 @@
 import threading
-import serial
+import serial.tools.list_ports
 import time
 from ..internal.ac_framework import component
 
@@ -10,7 +10,7 @@ class ArduinoService:
         self.serial = None
         self._stop = False
         self.thread = threading.Thread(target=self._connection_loop, daemon=True)
-        self.baudrate = 9600
+        self.baudrate = 115200
 
     def start(self):
         self.thread.start()
@@ -27,22 +27,22 @@ class ArduinoService:
             time.sleep(self.retry_interval)
 
     def _connect(self):
-        ports = [p.device for p in serial.tools.list_ports.comports()]
-        for port in ports:
-            try:
-                print(f"Trying {port}...")
-                s = serial.Serial(port, self.baudrate, timeout=1)
-                time.sleep(2)
-                s.write(b'PING\n')
-                reply = s.readline().decode().strip()
-                if reply.startswith("PONG") or reply.startswith("Arduino"):
-                    self.serial = s
-                    print(f"Connected to Arduino on {port}")
-                    return
-                else:
-                    s.close()
-            except serial.SerialException:
-                pass
+        port = "/dev/ttyACM0"
+        try:
+            print(f"Trying {port}...")
+            s = serial.Serial(port, self.baudrate, timeout=1)
+            time.sleep(2)
+            s.write(b'w\n')
+            reply = s.readline().decode().strip()
+            if reply.lower().startswith('ok'):
+                self.serial = s
+                print(f"Connected to Arduino on {port}")
+                return
+            else:
+                s.close()
+        except serial.SerialException as e:
+            print(f"Failed to connect to {port}: {e}")
+
         print("Arduino not found. Retrying...")
 
     def send(self, message: str):
