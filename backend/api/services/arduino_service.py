@@ -27,7 +27,7 @@ class ArduinoService:
             time.sleep(self.retry_interval)
 
     def _connect(self):
-        port = "/dev/ttyACM0"
+        port = "/dev/serial0"
         try:
             print(f"Trying {port}...")
             s = serial.Serial(port, self.baudrate, timeout=1)
