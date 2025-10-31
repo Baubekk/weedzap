@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function connectWebSocket() {
-        websocket = new WebSocket('ws://localhost:8000/ws');
+        websocket = new WebSocket(`ws://${window.location.hostname}:8000/ws`);
 
         websocket.onopen = () => {
             wsStatus.textContent = 'Connected';
