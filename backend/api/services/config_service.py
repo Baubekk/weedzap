@@ -56,18 +56,12 @@ class ConfigService:
     
     def set_laser_speed(self, speed):
         self._set("laser_speed", speed)
-        self.arduino_service.send(f"xs {speed}")
-        self.arduino_service.send(f"ys {speed}")
-        self.arduino_service.send(f"zs {speed}")
 
     def get_laser_speed(self):
         return self._get("laser_speed")
     
     def set_laser_acceleration(self, acceleration):
         self._set("laser_acceleration", acceleration)
-        self.arduino_service.send(f"xa {acceleration}")
-        self.arduino_service.send(f"ya {acceleration}")
-        self.arduino_service.send(f"za {acceleration}")
 
     def get_laser_acceleration(self):
         return self._get("laser_acceleration")
