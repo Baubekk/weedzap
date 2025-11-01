@@ -27,13 +27,9 @@ async def websocket_endpoint(
             data: dict = await websocket.receive_json()
             msg_type = data.get("type")
             if msg_type == "laser":
-                response = await laser_service.handle(data.get("data"))
-                if response is not None:
-                    await websocket.send_json(response)
+                laser_service.handle(data.get("data"))
             elif msg_type == "movement":
-                response = await movement_service.handle(data.get("data"))
-                if response is not None:
-                    await websocket.send_json(response)
+                movement_service.handle(data.get("data"))
             
     except WebSocketDisconnect:
         await websocket_service.disconnect()
