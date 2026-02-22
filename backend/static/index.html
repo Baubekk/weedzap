@@ -3,87 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laser Control Panel</title>
+    <title>Weedzap Control Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Laser Control Panel</h1>
+        <h1>Weedzap Control Panel</h1>
 
-        <section class="current-config">
-            <h2>Current Configuration</h2>
-            <p>Speed: <span id="current-speed">N/A</span></p>
-            <p>Acceleration: <span id="current-acceleration">N/A</span></p>
-            <p>Movement Mode: <span id="current-movement-mode">N/A</span></p>
-            <p>Laser State: <span id="current-laser-state">N/A</span></p>
-        </section>
+        <div class="main-content">
+            <section class="current-config">
+                <h2>Current Configuration</h2>
+                <p>Steps X: <span id="current-steps_x">N/A</span></p>
+                <p>Steps Y: <span id="current-steps_y">N/A</span></p>
+                <p>Steps Z: <span id="current-steps_z">N/A</span></p>
+                <p>Limit X: <span id="current-limit_x">N/A</span></p>
+                <p>Limit Y: <span id="current-limit_y">N/A</span></p>
+                <p>Limit Z: <span id="current-limit_z">N/A</span></p>
+                <p>Max Speed: <span id="current-max_speed">N/A</span></p>
+                <p>Acceleration: <span id="current-accel">N/A</span></p>
+            </section>
 
-        <section class="config-controls">
-            <h2>Set Configuration</h2>
-            <div class="control-group">
-                <label for="set-speed">Speed (0-10000):</label>
-                <input type="number" id="set-speed" min="0" max="10000" step="any" value="1000">
-                <button id="btn-set-speed">Set Speed</button>
-            </div>
-            <div class="control-group">
-                <label for="set-acceleration">Acceleration (0-10000):</label>
-                <input type="number" id="set-acceleration" min="0" max="10000" step="any" value="1000">
-                <button id="btn-set-acceleration">Set Acceleration</button>
-            </div>
-            <div class="control-group">
-                <label for="set-movement-mode">Movement Mode:</label>
-                <select id="set-movement-mode">
-                    <option value="hold">Hold</option>
-                    <option value="step">Step</option>
-                </select>
-                <button id="btn-set-movement-mode">Set Mode</button>
-            </div>
-            <div class="control-group">
-                <label for="set-laser-state">Laser State:</label>
-                <select id="set-laser-state">
-                    <option value="safe">Safe</option>
-                    <option value="armed">Armed</option>
-                </select>
-                <button id="btn-set-laser-state">Set State</button>
-            </div>
-        </section>
+            <section class="config-controls">
+                <h2>Set Configuration</h2>
+                <div class="control-group">
+                    <label for="set-steps_x">Steps X (0-10000):</label>
+                    <input type="number" id="set-steps_x" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-steps_x">Set Steps X</button>
+                </div>
+                <div class="control-group">
+                    <label for="set-steps_y">Steps Y (0-10000):</label>
+                    <input type="number" id="set-steps_y" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-steps_y">Set Steps Y</button>
+                </div>
+                <div class="control-group">
+                    <label for="set-steps_z">Steps Z (0-10000):</label>
+                    <input type="number" id="set-steps_z" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-steps_z">Set Steps Z</button>
+                </div>
+                <div class="control-group">
+                    <label for="set-limit_x">Limit X (0-10000):</label>
+                    <input type="number" id="set-limit_x" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-limit_x">Set Limit X</button>
+                </div>
+                <div class="control-group">
+                    <label for="set-limit_y">Limit Y (0-10000):</label>
+                    <input type="number" id="set-limit_y" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-limit_y">Set Limit Y</button>
+                </div>
+                <div class="control-group">
+                    <label for="set-limit_z">Limit Z (0-10000):</label>
+                    <input type="number" id="set-limit_z" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-limit_z">Set Limit Z</button>
+                </div>
+                <div class="control-group">
+                    <label for="set-max_speed">Max Speed (0-10000):</label>
+                    <input type="number" id="set-max_speed" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-max_speed">Set Max Speed</button>
+                </div>
+                <div class="control-group">
+                    <label for="set-accel">Acceleration (0-10000):</label>
+                    <input type="number" id="set-accel" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-accel">Set Acceleration</button>
+                </div>
+            </section>
 
-        <section class="movement-controls">
-            <h2>Movement Controls</h2>
-            <div class="hold-movement">
-                <h3>Hold Movement</h3>
-                <button class="btn-hold" data-axis="x" data-positive="true">X+</button>
-                <button class="btn-hold" data-axis="x" data-positive="false">X-</button>
-                <button class="btn-hold" data-axis="y" data-positive="true">Y+</button>
-                <button class="btn-hold" data-axis="y" data-positive="false">Y-</button>
-                <button class="btn-hold" data-axis="z" data-positive="true">Z+</button>
-                <button class="btn-hold" data-axis="z" data-positive="false">Z-</button>
-            </div>
-            <div class="step-movement">
-                <h3>Step Movement</h3>
-                <label for="step-value">Step Value:</label>
-                <input type="number" id="step-value" value="10">
-                <button class="btn-step" data-axis="x">Step X</button>
-                <button class="btn-step" data-axis="y">Step Y</button>
-                <button class="btn-step" data-axis="z">Step Z</button>
-            </div>
-        </section>
+            <section class="movement-controls">
+                <h2>Movement Controls</h2>
+                <div class="control-group">
+                    <h3>Move Absolute</h3>
+                    <label for="move-x">X:</label>
+                    <input type="number" id="move-x" value="0">
+                    <label for="move-y">Y:</label>
+                    <input type="number" id="move-y" value="0">
+                    <label for="move-z">Z:</label>
+                    <input type="number" id="move-z" value="0">
+                    <label for="move-speed">Speed:</label>
+                    <input type="number" id="move-speed" value="1000">
+                    <button id="btn-move-to">Move To</button>
+                </div>
+                <div class="control-group">
+                    <h3>Home Position</h3>
+                    <button id="btn-home">Go Home</button>
+                </div>
+            </section>
 
-        <section class="firing-control">
-            <h2>Laser Firing</h2>
-            <button id="btn-fire-laser">Fire Laser (Toggle)</button>
-        </section>
+            <section class="laser-controls">
+                <h2>Laser Controls</h2>
+                <div class="control-group">
+                    <label for="set-tool-mode">Tool Mode:</label>
+                    <select id="set-tool-mode">
+                        <option value="laser">Laser</option>
+                        <option value="water">Water</option>
+                    </select>
+                    <button id="btn-set-tool-mode">Set Tool Mode</button>
+                </div>
+                <div class="control-group">
+                    <button id="btn-fire-tool">Fire Tool</button>
+                    <button id="btn-stop-tool">Stop Tool</button>
+                </div>
+            </section>
 
-        <section class="camera-feed">
-            <h2>Camera Feed</h2>
-            <img id="cameraFeed" src="" alt="Camera Feed">
-        </section>
+            <section class="camera-feed">
+                <h2>Camera Feed</h2>
+                <img id="cameraFeed" src="" alt="Camera Feed">
+            </section>
 
-        <section class="status-log">
-            <h2>Status Log</h2>
-            <p>Websocket Status: <span id="ws-status">Disconnected</span></p>
-            <div id="log-output"></div>
-        </section>
+            <section class="status-log">
+                <h2>Status Log</h2>
+                <p>Websocket Status: <span id="ws-status">Disconnected</span></p>
+                <div id="log-output"></div>
+            </section>
+        </div>
     </div>
 
     <script src="static/script.js"></script>

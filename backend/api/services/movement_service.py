@@ -1,33 +1,29 @@
+import asyncio
 from ..internal.ac_framework import component, inject
-from .config_service import ConfigService, MovementMode
+from .config_service import ConfigService
 from .handler_service import HandlerService
+from .arduino_service import ArduinoService
+import threading
 
 @component
-class MovementService(HandlerService):
-    def __init__(self, config_service: ConfigService):
-        self.current = None
-        self.queued = None
+class MovementService:
+    def __init__(self, config_service: ConfigService, arduino_service: ArduinoService):
+
         self.config_service = config_service
+        self.arduino_service = arduino_service
+        self._move_lock = threading.Lock()
 
-    async def handle(self, data: dict):
-        movement_mode = MovementMode(data.get("mode"))
-        if movement_mode == MovementMode.HOLD:
-            if self.config_service.get_movement_mode() != MovementMode.HOLD:
-                return {"error": "Movement mode is not hold. Change to hold mode first. POST /config/movement-mode with body { \"movement_mode\": \"hold\" }"}
-            await self.hold(data.get("data"))
-        elif movement_mode == MovementMode.STEP:
-            if self.config_service.get_movement_mode() != MovementMode.STEP:
-                return {"error": "Movement mode is not step. Change to step mode first. POST /config/movement-mode with body { \"movement_mode\": \"step\" }"}
-            await self.step(data.get("data"))
 
-    async def hold(self, data: dict):
-        if self.current is not None and data.get("active") is True:
-            self.current = data
-        else:
-            self.current = None
+    async def move(self, x: float, y: float, z: float):
+        if not self._move_lock.acquire(blocking=False):
+            print("Movement in progress, command ignored.")
+            return False, "Movement in progress, command ignored."
+        try:
+            success, response = await asyncio.to_thread(self.arduino_service.send_move_command, x, y, z)
+            return success, response
+        finally:
+            self._move_lock.release()
 
-    async def step(self, data: dict):
-        if self.current is not None:
-            self.queued = data
-        else:
-            self.current = data
+    async def home(self):
+        success, response = await asyncio.to_thread(self.arduino_service.send_home_command)
+        return success, response

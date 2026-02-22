@@ -71,5 +71,62 @@ class ArduinoService:
     def is_connected(self):
         return self.serial and self.serial.is_open
 
+    def send_command(self, command: str, expected_response_prefix: str = "OK", timeout: int = 5):
+        if not self.send(command):
+            return False, "Failed to send command."
+
+        return self._await_response(expected_response_prefix, timeout)
+
+    def _await_response(self, expected_response_prefix: str, timeout: int = 5):
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            response = self.read_line()
+            if response:
+                print(f"Arduino response: {response}")
+                if response.startswith(expected_response_prefix):
+                    return True, response
+                elif response.startswith("ERROR"):
+                    return False, response
+            time.sleep(0.1) # Small delay to prevent busy-waiting
+        return False, "Timeout waiting for response."
+
+    def send_set_command(self, config_key: str, config_value: str):
+        command = f"SET {config_key} {config_value}"
+        success, response = self.send_command(command, "OK: Config Updated")
+        return success, response
+
+    def send_tool_command(self, tool_mode: str):
+        command = f"TOOL {tool_mode}"
+        success, response = self.send_command(command, "OK: Mode")
+        if success and ("OK: Mode SERVO" in response or "OK: Mode LASER" in response):
+            return True, response
+        return False, response
+
+    def send_fire_command(self, value: int):
+        command = f"FIRE {value}"
+        success, response = self.send_command(command, "OK:")
+        if success and ("OK: Servo Angle" in response or "OK: Laser PWM" in response):
+            return True, response
+        return False, response
+
+    def send_move_command(self, x: float, y: float, z: float):
+        command = f"MOVE X{x} Y{y} Z{z}"
+        success, response = self.send_command(command, "OK: Moved")
+        return success, response
+
+    def send_home_command(self):
+        command = "HOME"
+        success, response = self.send_command(command, "STATUS: Homing...")
+        if success:
+            print("Homing initiated, waiting for completion...")
+            success, response = self._await_response("OK: Homed")
+            return success, response
+        return False, response
+
+    def send_stop_command(self):
+        command = "STOP"
+        success, response = self.send_command(command, "OK: Stopped")
+        return success, response
+
 
             

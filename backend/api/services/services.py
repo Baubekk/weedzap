@@ -10,6 +10,6 @@ websocket_service = WebsocketService()
 config_service = ConfigService(arduino_service=arduino_service)
 laser_service = LaserService(config_service=config_service, arduino_service=arduino_service)
 camera_service = CameraService(websocket_service=websocket_service)
-movement_service = MovementService(config_service=config_service)
+movement_service = MovementService(config_service=config_service, arduino_service=arduino_service)
 
 arduino_service.start()

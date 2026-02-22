@@ -1,0 +1,14 @@
+{
+    "steps_x": 20,
+    "steps_y": 1000,
+    "steps_z": 400.0,
+    "limit_x": 500.0,
+    "limit_y": 500.0,
+    "limit_z": 100.0,
+    "max_speed": 2000.0,
+    "accel": 1000.0,
+    "movement_mode": "hold",
+    "laser_movement_mode": "hold",
+    "laser_state": "safe",
+    "speed": 1000.0
+}
