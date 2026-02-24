@@ -39,14 +39,21 @@ class ArduinoService:
             print(f"Trying {port}...")
             s = serial.Serial(port, self.baudrate, timeout=1)
             time.sleep(2)
+            s.reset_input_buffer()
             s.write(b'w\n')
-            reply = s.readline().decode().strip()
-            if reply.lower().startswith('ok'):
-                self.serial = s
-                print(f"Connected to Arduino on {port}")
-                return
-            else:
-                s.close()
+
+            start = time.time()
+
+            while time.time() - start < 3:
+                line = s.readline().decode(errors='ignore').strip()
+                if line:
+                    print("Received:", line)
+                    if line.lower().startswith("ok"):
+                        self.serial = s
+                        print(f"Connected to Arduino on {port}")
+                        return
+
+            s.close()
         except serial.SerialException as e:
             print(f"Failed to connect to {port}: {e}")
 
