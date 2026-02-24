@@ -110,10 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // Update websocket.onmessage to handle new message types
         websocket.onmessage = (event) => {
             const message = JSON.parse(event.data);
-            // Prevent camera_frame messages from being logged to avoid clutter
-            if (message.type !== "camera_frame") {
-                logMessage(`Received: ${JSON.stringify(message)}`);
-            }
 
             if (message.type === "camera_frame") {
                 cameraFeed.src = `data:image/jpeg;base64,${message.data}`;
@@ -124,11 +120,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else {
                     logMessage(`Config update failed for ${message.param}: ${message.message}`, "error");
                 }
-            } else if (message.type === "movement_ack" || message.type === "laser_ack" || message.type === "led_ack" || message.type === "raw_ack") {
+            } else if (message.type === "movement_ack") {
                 if (message.status === "success") {
-                    logMessage(`${message.type} acknowledged. Command: ${message.command}. ${message.message || ""}`);
+                    logMessage(`Movement acknowledged. Command: ${message.command}. ${message.message || ""}`);
                 } else {
-                    logMessage(`${message.type} failed. Command: ${message.command}. Error: ${message.message}`, "error");
+                    logMessage(`Movement failed. Command: ${message.command}. Error: ${message.message}`, "error");
+                }
+            } else if (message.type === "laser_ack") {
+                if (message.status === "success") {
+                    logMessage(`Laser acknowledged. Command: ${message.command}. ${message.message || ""}`);
+                } else {
+                    logMessage(`Laser failed. Command: ${message.command}. Error: ${message.message}`, "error");
+                }
+            } else if (message.type === "led_ack") {
+                if (message.status === "success") {
+                    logMessage(`LED acknowledged. Command: ${message.command}. ${message.message || ""}`);
+                } else {
+                    logMessage(`LED failed. Command: ${message.command}. Error: ${message.message}`, "error");
+                }
+            } else if (message.type === "raw_ack") {
+                if (message.status === "success") {
+                    logMessage(`Raw command acknowledged. Command: ${message.command}. ${message.message || ""}`);
+                } else {
+                    logMessage(`Raw command failed. Command: ${message.command}. Error: ${message.message}`, "error");
                 }
             } else if (message.type === "pos_update") {
                 currentPosDisplay.textContent = `X: ${message.data.x}, Y: ${message.data.y}, Z: ${message.data.z}`;
@@ -311,9 +325,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    btnGetCurrentToolStatus.addEventListener("click", () => {
-        sendLaserCommand("tool_status");
-    });
+    // btnGetCurrentToolStatus.addEventListener("click", () => {
+    //     sendLaserCommand("tool_status");
+    // });
 
     // LED Control Event Listeners
     btnLedOn.addEventListener("click", () => {
@@ -368,6 +382,26 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem('theme', newTheme);
         });
     }
+
+    // THEME SWITCH
+
+    const toggle = document.getElementById("theme-toggle");
+
+    // load saved theme
+    if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark-theme");
+        toggle.checked = true;
+    }
+
+    toggle.addEventListener("change", () => {
+        document.body.classList.toggle("dark-theme");
+
+        if (document.body.classList.contains("dark-theme")) {
+            localStorage.setItem("theme", "dark");
+        } else {
+            localStorage.setItem("theme", "light");
+        }
+    });
 
     // Initial websocket connection
     connectWebSocket();
