@@ -194,6 +194,17 @@ async def websocket_endpoint(
                 else:
                     await websocket.send_json({"type": "led_ack", "command": command, "status": "error", "message": "Unknown led command"})
             
+            elif msg_type == "raw":
+                command = data.get("command")
+                if command is not None:
+                    success, message = arduino_service.send_command(command)
+                    if success:
+                        await websocket.send_json({"type": "raw_ack", "command": command, "status": "success", "message": message})
+                    else:
+                        await websocket.send_json({"type": "raw_ack", "command": command, "status": "error", "message": message})
+                else:
+                    await websocket.send_json({"type": "raw_ack", "status": "error", "message": "Missing command for raw command"})
+            
     except WebSocketDisconnect:
         await websocket_service.disconnect()
         print(f"Client disconnected: {websocket.client}")
