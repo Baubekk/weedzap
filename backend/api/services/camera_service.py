@@ -52,10 +52,10 @@ class CameraService:
                 if ret:
                     # Encode frame to JPEG
                     encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 80] # 80% quality
-                    _, buffer = cv2.imencode('.jpg', frame, encode_param)
+                    _, buffer = cv2.imencode(".jpg", frame, encode_param)
                     
                     # Convert to base64 string for JSON serialization
-                    jpeg_as_text = base64.b64encode(buffer).decode('utf-8')
+                    jpeg_as_text = base64.b64encode(buffer).decode("utf-8")
                     
                     await self.websocket_service.send({
                         "type": "camera_frame",

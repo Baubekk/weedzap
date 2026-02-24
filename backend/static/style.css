@@ -1,112 +1,134 @@
 /* General Styling */
 :root {
-    --primary-green: #4CAF50;
-    --light-green: #8BC34A;
-    --dark-green: #388E3C;
-    --white: #FFFFFF;
-    --light-grey: #F0F0F0;
-    --text-color: #333333;
-    --border-color: #DDDDDD;
-    --shadow-color: rgba(0, 0, 0, 0.1);
+    --bg-color: #F0F0F0; /* Light background */
+    --text-color: #333333; /* Dark text for light theme */
+    --panel-bg-color: #FFFFFF; /* Light panel background */
+    --border-color: #CCCCCC; /* Light border */
+    --accent-color: #4CAF50; /* Vibrant green for accents */
+    --accent-hover: #45a049;
+    --shadow-color: rgba(0, 0, 0, 0.1); /* Light shadow */
+    --console-bg-color: #EEEEEE; /* Console background for light theme */
+    --console-text-color: #000000; /* Console text for light theme */
+    --control-group-bg-color: #F8F8F8; /* Control group background for light theme */
+    --input-bg-color: #FFFFFF; /* Input background for light theme */
+    --input-text-color: #000000; /* Input text for light theme */
+}
+
+body.dark-theme {
+    --bg-color: #2c2c2c; /* Dark background */
+    --text-color: #e0e0e0; /* Light text for dark theme */
+    --panel-bg-color: #3c3c3c; /* Dark panel background */
+    --border-color: #555555; /* Darker border */
+    --shadow-color: rgba(0, 0, 0, 0.5); /* Dark shadow */
+    --console-bg-color: #333333; /* Console background for dark theme */
+    --console-text-color: #eeeeee; /* Console text for dark theme */
+    --control-group-bg-color: #383838; /* Control group background for dark theme */
+    --input-bg-color: #444444; /* Input background for dark theme */
+    --input-text-color: #eeeeee; /* Input text for dark theme */
 }
 
 body {
-    font-family: 'Roboto', sans-serif; /* Clean, readable font */
-    background-color: var(--light-grey);
+    font-family: 'Roboto', sans-serif;
+        background-color: var(--bg-color);
     color: var(--text-color);
     margin: 0;
-    padding: 20px;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: flex-start;
     min-height: 100vh;
     box-sizing: border-box;
+    overflow: hidden; /* Prevent scrolling on the body */
 }
 
-.container {
-    background-color: var(--white);
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 6px 12px var(--shadow-color);
-    width: 100%;
-    max-width: 900px;
+/* Dashboard Layout */
+#dashboard-layout {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 30px;
+    grid-template-columns: 1fr 2fr 1fr; /* Left, Main, Right */
+    grid-template-rows: auto 1fr auto; /* Header, Content, Console */
+    grid-template-areas:
+        "header header header"
+        "left-sidebar main-content-area right-sidebar"
+        "console console console";
+    gap: 15px;
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.dashboard-header {
+    grid-area: header;
+    background-color: var(--panel-bg-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dashboard-header h1 {
+    color: var(--text-color);
+    margin: 0;
+    font-size: 2em;
+    border-bottom: none;
+}
+
+#left-sidebar {
+    grid-area: left-sidebar;
+    overflow-y: auto; /* Allow scrolling within the sidebar if content overflows */
+}
+
+#main-content-area {
+    grid-area: main-content-area;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Allow scrolling for main content */
+}
+
+#right-sidebar {
+    grid-area: right-sidebar;
+    overflow-y: auto; /* Allow scrolling within the sidebar if content overflows */
+}
+
+#console {
+    grid-area: console;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Panel Styling */
+.panel {
+    background-color: var(--panel-bg-color);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 5px var(--shadow-color);
 }
 
 /* Headings */
-h1, h2, h3 {
-    color: var(--primary-green);
+h2, h3 {
+    color: var(--accent-color);
     text-align: center;
-    margin-bottom: 20px;
+    margin-top: 0;
+    margin-bottom: 15px;
     font-weight: 500;
 }
 
-h1 {
-    font-size: 2.5em;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--primary-green);
-}
-
-h2 {
-    font-size: 1.8em;
-    position: relative;
-    display: inline-block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-h2::before, h2::after {
-    content: '';
-    position: absolute;
-    background-color: var(--light-green);
-    height: 10px;
-    width: 10px;
-    transform: rotate(45deg); /* Hexagon-like diamond shape */
-    top: 50%;
-    margin-top: -5px;
-}
-
-h2::before {
-    left: -20px;
-}
-
-h2::after {
-    right: -20px;
+/* Remove hexagonal decorations */
+h2::before, h2::after,
+section::before, section::after {
+    content: none;
 }
 
 /* Sections */
 section {
-    margin-bottom: 20px;
-    padding: 20px;
+    margin-bottom: 15px;
+    padding: 15px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    position: relative;
-    overflow: hidden;
-    background-color: var(--light-grey);
-}
-
-/* Hexagonal decoration for sections */
-section::before {
-    content: '';
-    position: absolute;
-    top: -30px;
-    left: -30px;
-    width: 60px;
-    height: 60px;
-    background-color: rgba(76, 175, 80, 0.1); /* Transparent green */
-    transform: rotate(60deg) skewX(30deg) scaleY(0.866);
-    /* This creates an approximate hexagon shape */
-    /* More complex hexagons might require SVG or multiple pseudo-elements */
-}
-
-section:nth-child(even)::before {
-    top: auto;
-    bottom: -30px;
-    left: auto;
-    right: -30px;
-    background-color: rgba(139, 195, 74, 0.1); /* Lighter transparent green */
+    background-color: var(--panel-bg-color);
 }
 
 /* Control Groups */
@@ -114,160 +136,209 @@ section:nth-child(even)::before {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     padding: 10px;
     border: 1px dashed var(--border-color);
     border-radius: 5px;
-    background-color: var(--white);
-}
-
-@media (min-width: 600px) {
-    .control-group {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-    }
+    background-color: var(--control-group-bg-color);
 }
 
 label {
-    font-weight: 600;
-    color: var(--dark-green);
+    font-weight: 400;
+    color: var(--text-color);
+    font-size: 0.9em;
 }
 
-input[type="number"], select {
+input[type="number"], input[type="text"], select {
     flex-grow: 1;
-    padding: 10px;
-    border: 1px solid var(--primary-green);
-    background-color: var(--white);
-    color: var(--text-color);
-    border-radius: 5px;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg-color);
+    color: var(--input-text-color);
+    border-radius: 4px;
     outline: none;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-size: 0.9em;
 }
 
-input[type="number"]:focus, select:focus {
-    border-color: var(--dark-green);
+input[type="number"]:focus, input[type="text"]:focus, select:focus {
+    border-color: var(--accent-color);
     box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
 }
 
 /* Buttons */
 button {
-    background-color: var(--primary-green);
-    color: var(--white);
-    padding: 10px 20px;
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    padding: 8px 15px;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
     font-weight: 500;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    position: relative;
-    overflow: hidden;
+    font-size: 0.85em;
 }
 
 button:hover {
-    background-color: var(--dark-green);
-    transform: translateY(-2px);
+    background-color: var(--accent-hover);
+    transform: translateY(-1px);
 }
 
 button:active {
     transform: translateY(0);
 }
 
-/* Button Hexagon Effect */
+/* Remove button hexagon effect */
 button::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 0;
-    height: 0;
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: rotate(45deg); /* Diamond shape for hover effect */
-    transition: all 0.4s ease-out;
-}
-
-button:hover::before {
-    width: 200%;
-    height: 200%;
+    content: none;
 }
 
 /* Specific component styling */
-.current-config p {
-    margin: 8px 0;
-    padding-left: 15px;
-    border-left: 3px solid var(--light-green);
+.current-config p,
+.status-display p {
+    margin: 5px 0;
+    padding-left: 10px;
+    border-left: 2px solid var(--accent-color);
+    font-size: 0.9em;
 }
 
-.movement-controls > div {
+.current-config p span,
+.status-display p span {
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.movement-controls .control-group {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 10px;
-    margin-top: 15px;
+    grid-template-columns: auto 1fr auto 1fr auto 1fr auto 1fr; /* Adjust as needed */
+    align-items: center;
+    gap: 5px;
 }
 
 .movement-controls h3 {
     text-align: left;
-    margin-bottom: 10px;
-    color: var(--dark-green);
+    grid-column: 1 / -1; /* Span across all columns */
+    margin-bottom: 5px;
+    font-size: 1.1em;
 }
 
-.status-log #log-output {
-    background-color: #E8F5E9; /* Very light green background for log */
-    border: 1px solid var(--primary-green);
-    padding: 15px;
-    height: 200px;
-    overflow-y: scroll;
-    border-radius: 8px;
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; /* Monospace for logs */
-    font-size: 0.85em;
-    color: var(--text-color);
-    white-space: pre-wrap; /* Preserve whitespace and wrap text */
-    word-wrap: break-word;
+.movement-controls button {
+    grid-column: auto / span 2; /* Make buttons span two columns */
+    margin-top: 5px;
+}
+
+.led-controls .control-group {
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
 }
 
 /* Camera Feed specific styling */
+.camera-feed {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
 .camera-feed img {
     max-width: 100%;
-    height: auto;
+    max-height: 100%;
+    object-fit: contain;
     display: block;
-    margin: 20px auto;
-    border: 2px solid var(--primary-green);
+    border: 2px solid var(--accent-color);
     border-radius: 8px;
     box-shadow: 0 4px 8px var(--shadow-color);
 }
 
+/* Console Styling */
+#console h2 {
+    margin-bottom: 10px;
+}
+
+#log-output {
+    background-color: #EEEEEE;
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    height: 200px; /* Fixed height for console output */
+    flex-grow: 0; /* No longer grow, fixed height */
+    overflow-y: scroll;
+    border-radius: 5px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    font-size: 0.8em;
+    color: var(--console-text-color);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin-bottom: 10px;
+}
+
+.arduino-command-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.arduino-command-input-group input {
+    flex-grow: 1;
+}
+
 /* Responsive adjustments */
+@media (max-width: 1200px) {
+    #dashboard-layout {
+        grid-template-columns: 1fr 1fr; /* Two columns for smaller desktops */
+        grid-template-rows: auto auto 1fr auto;
+        grid-template-areas:
+            "header header"
+            "left-sidebar right-sidebar"
+            "main-content-area main-content-area"
+            "console console";
+    }
+}
+
 @media (max-width: 768px) {
-    .container {
-        padding: 20px;
+    #dashboard-layout {
+        grid-template-columns: 1fr; /* Single column for tablets and mobiles */
+        grid-template-rows: auto auto auto auto auto;
+        grid-template-areas:
+            "header"
+            "left-sidebar"
+            "right-sidebar"
+            "main-content-area"
+            "console";
+        padding: 10px;
+        gap: 10px;
     }
 
-    body {
+    .panel {
         padding: 10px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.8em;
+    }
+
+    h2 {
+        font-size: 1.4em;
     }
 }
 
 @media (max-width: 480px) {
-    h1 {
-        font-size: 2em;
-    }
-
-    h2 {
+    .dashboard-header h1 {
         font-size: 1.5em;
     }
 
-    .control-group {
-        flex-direction: column;
-        align-items: flex-start;
+    h2 {
+        font-size: 1.2em;
     }
 
     button {
         width: 100%;
     }
 
-    .movement-controls > div {
-        grid-template-columns: 1fr;
+    .arduino-command-input-group {
+        flex-direction: column;
     }
 }

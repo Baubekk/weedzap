@@ -27,7 +27,7 @@ class ArduinoService:
             time.sleep(self.retry_interval)
 
     def _connect(self):
-        port = "/dev/serial0"
+        port = "/dev/ttyACM0"
         try:
             print(f"Trying {port}...")
             s = serial.Serial(port, self.baudrate, timeout=1)
@@ -71,57 +71,72 @@ class ArduinoService:
     def is_connected(self):
         return self.serial and self.serial.is_open
 
-    def send_command(self, command: str, expected_response_prefix: str = "OK", timeout: int = 5):
+    def send_command(self, command: str, expected_response_prefixes: list[str] = None, timeout: int = 5):
+        if expected_response_prefixes is None:
+            expected_response_prefixes = ["OK"]
+
         if not self.send(command):
             return False, "Failed to send command."
 
-        return self._await_response(expected_response_prefix, timeout)
+        return self._await_response(expected_response_prefixes, timeout)
 
-    def _await_response(self, expected_response_prefix: str, timeout: int = 5):
+    def _await_response(self, expected_response_prefixes: list[str], timeout: int = 5):
         start_time = time.time()
         while time.time() - start_time < timeout:
             response = self.read_line()
             if response:
                 print(f"Arduino response: {response}")
-                if response.startswith(expected_response_prefix):
-                    return True, response
-                elif response.startswith("ERROR"):
+                for prefix in expected_response_prefixes:
+                    if prefix == "POS X:" and response.startswith("POS X:") and "Y:" in response and "Z:" in response:
+                        return True, response
+                    elif response.startswith(prefix):
+                        return True, response
+                if response.startswith("ERROR"):
                     return False, response
             time.sleep(0.1) # Small delay to prevent busy-waiting
         return False, "Timeout waiting for response."
 
-    def send_set_command(self, config_key: str, config_value: str):
-        command = f"SET {config_key} {config_value}"
-        success, response = self.send_command(command, "OK: Config Updated")
+
+    def send_set_command(self, param_name: str, value: str):
+        command = f"SET {param_name} {value}"
+        success, response = self.send_command(command, ["OK: Config Updated"])
         return success, response
 
-    def send_tool_command(self, tool_mode: str):
-        command = f"TOOL {tool_mode}"
-        success, response = self.send_command(command, "OK: Mode")
-        if success and ("OK: Mode SERVO" in response or "OK: Mode LASER" in response):
-            return True, response
-        return False, response
+    def send_tool_on_command(self, tool_number: int) -> tuple[bool, str]:
+        command = f"TOOLON {tool_number}"
+        return self.send_command(command, ["OK: Laser tool attached", "OK: Servo tool attached"])
 
-    def send_fire_command(self, value: int):
-        command = f"FIRE {value}"
-        success, response = self.send_command(command, "OK:")
-        if success and ("OK: Servo Angle" in response or "OK: Laser PWM" in response):
-            return True, response
-        return False, response
+    def send_tool_off_command(self) -> tuple[bool, str]:
+        command = "TOOLOFF"
+        return self.send_command(command, ["OK: Laser tool returned", "OK: Servo tool returned"])
+
+    def send_jog_command(self, dx: float, dy: float, dz: float) -> tuple[bool, str]:
+        command = f"JOG X{dx} Y{dy} Z{dz}"
+        return self.send_command(command, ["POS X:"])
+
+    def send_pos_command(self) -> tuple[bool, str]:
+        command = "POS"
+        return self.send_command(command, ["POS X:"])
+
+    def send_status_command(self) -> tuple[bool, str]:
+        command = "STATUS"
+        return self.send_command(command, ["STATUS:"])
+
+    def send_led_command(self, state: int) -> tuple[bool, str]:
+        command = f"LED {state}"
+        return self.send_command(command, ["OK: LED ON", "OK: LED OFF"])
+
+
 
     def send_move_command(self, x: float, y: float, z: float):
         command = f"MOVE X{x} Y{y} Z{z}"
-        success, response = self.send_command(command, "OK: Moved")
+        success, response = self.send_command(command, ["POS X:"])
         return success, response
 
     def send_home_command(self):
         command = "HOME"
-        success, response = self.send_command(command, "STATUS: Homing...")
-        if success:
-            print("Homing initiated, waiting for completion...")
-            success, response = self._await_response("OK: Homed")
-            return success, response
-        return False, response
+        success, response = self.send_command(command, ["STATUS: Home OK"])
+        return success, response
 
     def send_stop_command(self):
         command = "STOP"

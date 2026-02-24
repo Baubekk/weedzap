@@ -5,30 +5,26 @@ from enum import Enum
 from ..internal.ac_framework import component, inject
 from .arduino_service import ArduinoService
 
-class MovementMode(Enum):
-    HOLD = "hold"
-    STEP = "step"
 
-class LaserState(Enum):
-    SAFE = "safe"
-    ARMED = "armed"
 
 @component
 class ConfigService:
     CONFIG_FILE = "../backend/api/config.json"
     DEFAULT_CONFIG = {
-        "steps_x": 80.0,
-        "steps_y": 80.0,
-        "steps_z": 400.0,
-        "limit_x": 500.0,
-        "limit_y": 500.0,
-        "limit_z": 100.0,
-        "max_speed": 2000.0,
-        "accel": 1000.0,
-        "movement_mode": MovementMode.HOLD.value,
-        "laser_movement_mode": MovementMode.HOLD.value,
-        "laser_state": LaserState.SAFE.value,
-        "speed": 1000.0, # This is for general movement, not laser specific
+        "steps_x": 9.52,
+        "steps_y": 202.45,
+        "steps_z": 206.0,
+        "x_max_l": 730.0,
+        "y_max_l": 390.0,
+        "z_max_l": 188.0,
+        "h_spd_x": 600.0,
+        "h_spd_y": 900.0,
+        "h_spd_z": 600.0,
+        "homing_speed_slow": 200.0,
+        "max_speed": 1500.0,
+        "accel": 800.0,
+        "LED_PIN_STATE": 0,
+
     }
 
     def __init__(self, arduino_service: ArduinoService):
@@ -60,15 +56,15 @@ class ConfigService:
     
     def _apply_config_to_arduino(self):
         # Apply initial configuration to Arduino based on loaded/default values
-        self.arduino_service.send(f"SET SPEED {self.get_speed()}")
-        self.arduino_service.send(f"SET ACCEL {self.get_acceleration()}")
-        self.arduino_service.send(f"SET STEPS_X {self.get_steps_x()}")
-        self.arduino_service.send(f"SET STEPS_Y {self.get_steps_y()}")
-        self.arduino_service.send(f"SET STEPS_Z {self.get_steps_z()}")
-        self.arduino_service.send(f"SET LIM_X {self.get_limit_x()}")
-        self.arduino_service.send(f"SET LIM_Y {self.get_limit_y()}")
-        self.arduino_service.send(f"SET LIM_Z {self.get_limit_z()}")
-
+        self.arduino_service.send(f"SET MS {self.get_max_speed()}")
+        self.arduino_service.send(f"SET SX {self.get_steps_x()}")
+        self.arduino_service.send(f"SET SY {self.get_steps_y()}")
+        self.arduino_service.send(f"SET SZ {self.get_steps_z()}")
+        self.arduino_service.send(f"SET HX {self.get_h_spd_x()}")
+        self.arduino_service.send(f"SET HY {self.get_h_spd_y()}")
+        self.arduino_service.send(f"SET HZ {self.get_h_spd_z()}")
+        self.arduino_service.send(f"SET HS {self.get_homing_speed_slow()}")
+        self.arduino_service.send(f"SET LED {self.get_led_state()}")
 
     def _set(self, key, value):
         self.__config[key] = value
@@ -83,82 +79,93 @@ class ConfigService:
     def unsafe_get(self, key):
         return self._get(key)
     
-    def set_speed(self, speed):
-        self._set("max_speed", speed) # Renamed "speed" to "max_speed" to align with arduino code
-        self.arduino_service.send(f"SET SPEED {speed}")
+    def set_max_speed(self, max_speed):
+        self._set("max_speed", max_speed)
+        self.arduino_service.send(f"SET MS {max_speed}")
 
-    def get_speed(self):
+    def get_max_speed(self):
         return self._get("max_speed")
     
-    def set_acceleration(self, acceleration):
-        self._set("accel", acceleration)
-        self.arduino_service.send(f"SET ACCEL {acceleration}")
+    def set_accel(self, accel):
+        self._set("accel", accel)
 
-    def get_acceleration(self):
+    def get_accel(self):
         return self._get("accel")
 
-    def set_movement_mode(self, mode: MovementMode):
-        self._set("movement_mode", mode.value)
 
-    def get_movement_mode(self):
-        return MovementMode(self._get("movement_mode"))
-    
-    def set_laser_movement_mode(self, mode: MovementMode):
-        self._set("laser_movement_mode", mode.value)
-
-    def get_laser_movement_mode(self):
-        return MovementMode(self._get("laser_movement_mode"))
-    
-
-    
-    
-    def set_laser_state(self, state: LaserState):
-        self._set("laser_state", state.value)
-
-    def get_laser_state(self):
-        return LaserState(self._get("laser_state"))
-
-    def set_steps_x(self, value: int):
+    def set_steps_x(self, value: float):
         self._set("steps_x", value)
-        self.arduino_service.send(f"SET STEPS_X {value}")
+        self.arduino_service.send(f"SET SX {value}")
 
     def get_steps_x(self):
         return self._get("steps_x")
 
-    def set_steps_y(self, value: int):
+    def set_steps_y(self, value: float):
         self._set("steps_y", value)
-        self.arduino_service.send(f"SET STEPS_Y {value}")
+        self.arduino_service.send(f"SET SY {value}")
 
     def get_steps_y(self):
         return self._get("steps_y")
 
-    def set_steps_z(self, value: int):
+    def set_steps_z(self, value: float):
         self._set("steps_z", value)
-        self.arduino_service.send(f"SET STEPS_Z {value}")
+        self.arduino_service.send(f"SET SZ {value}")
 
     def get_steps_z(self):
         return self._get("steps_z")
 
-    def set_limit_x(self, value: int):
-        self._set("limit_x", value)
-        self.arduino_service.send(f"SET LIM_X {value}")
+    def set_x_max_l(self, value: float):
+        self._set("x_max_l", value)
 
-    def get_limit_x(self):
-        return self._get("limit_x")
+    def get_x_max_l(self):
+        return self._get("x_max_l")
 
-    def set_limit_y(self, value: int):
-        self._set("limit_y", value)
-        self.arduino_service.send(f"SET LIM_Y {value}")
+    def set_y_max_l(self, value: float):
+        self._set("y_max_l", value)
 
-    def get_limit_y(self):
-        return self._get("limit_y")
+    def get_y_max_l(self):
+        return self._get("y_max_l")
 
-    def set_limit_z(self, value: int):
-        self._set("limit_z", value)
-        self.arduino_service.send(f"SET LIM_Z {value}")
+    def set_z_max_l(self, value: float):
+        self._set("z_max_l", value)
 
-    def get_limit_z(self):
-        return self._get("limit_z")
+    def get_z_max_l(self):
+        return self._get("z_max_l")
+    
+    def set_h_spd_x(self, value: float):
+        self._set("h_spd_x", value)
+        self.arduino_service.send(f"SET HX {value}")
+
+    def get_h_spd_x(self):
+        return self._get("h_spd_x")
+    
+    def set_h_spd_y(self, value: float):
+        self._set("h_spd_y", value)
+        self.arduino_service.send(f"SET HY {value}")
+
+    def get_h_spd_y(self):
+        return self._get("h_spd_y")
+    
+    def set_h_spd_z(self, value: float):
+        self._set("h_spd_z", value)
+        self.arduino_service.send(f"SET HZ {value}")
+
+    def get_h_spd_z(self):
+        return self._get("h_spd_z")
+
+    def set_homing_speed_slow(self, value: float):
+        self._set("homing_speed_slow", value)
+        self.arduino_service.send(f"SET HS {value}")
+
+    def get_homing_speed_slow(self):
+        return self._get("homing_speed_slow")
+    
+    def set_led_state(self, value: int):
+        self._set("LED_PIN_STATE", value)
+        self.arduino_service.send(f"SET LED {value}")
+    
+    def get_led_state(self):
+        return self._get("LED_PIN_STATE")
 
     def get_all_config(self):
         return self.__config

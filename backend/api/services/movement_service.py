@@ -20,10 +20,34 @@ class MovementService:
             return False, "Movement in progress, command ignored."
         try:
             success, response = await asyncio.to_thread(self.arduino_service.send_move_command, x, y, z)
+            if success and response.startswith("POS X:"):
+                return True, response
+            return False, f"Move command failed: {response}"
+        finally:
+            self._move_lock.release()
+
+    async def jog(self, dx: float, dy: float, dz: float) -> tuple[bool, str]:
+        if not self._move_lock.acquire(blocking=False):
+            print("Movement in progress, command ignored.")
+            return False, "Movement in progress, command ignored."
+        try:
+            success, response = await asyncio.to_thread(self.arduino_service.send_jog_command, dx, dy, dz)
             return success, response
         finally:
             self._move_lock.release()
 
     async def home(self):
         success, response = await asyncio.to_thread(self.arduino_service.send_home_command)
+        if success and "STATUS: Home OK" in response:
+            return True, "Home command successful."
+        return False, f"Home command failed: {response}"
+
+    async def get_current_position(self) -> tuple[bool, str]:
+        success, response = await asyncio.to_thread(self.arduino_service.send_pos_command)
+        if success and response.startswith("POS X:"):
+            return True, response
+        return False, f"Failed to get current position: {response}"
+
+    async def get_status(self) -> tuple[bool, str]:
+        success, response = await asyncio.to_thread(self.arduino_service.send_status_command)
         return success, response

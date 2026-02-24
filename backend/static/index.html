@@ -10,22 +10,93 @@
     <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Weedzap Control Panel</h1>
+    <div id="dashboard-layout">
+        <header class="dashboard-header">
+            <h1>Weedzap Control Panel</h1>
+            <div class="theme-switch-wrapper">
+                <input type="checkbox" id="theme-switch">
+                <label for="theme-switch">Dark Mode</label>
+            </div>
+        </header>
 
-        <div class="main-content">
+        <aside id="left-sidebar" class="panel">
             <section class="current-config">
                 <h2>Current Configuration</h2>
                 <p>Steps X: <span id="current-steps_x">N/A</span></p>
                 <p>Steps Y: <span id="current-steps_y">N/A</span></p>
                 <p>Steps Z: <span id="current-steps_z">N/A</span></p>
-                <p>Limit X: <span id="current-limit_x">N/A</span></p>
-                <p>Limit Y: <span id="current-limit_y">N/A</span></p>
-                <p>Limit Z: <span id="current-limit_z">N/A</span></p>
+                <p>X Max Limit: <span id="current-x_max_l">N/A</span></p>
+                <p>Y Max Limit: <span id="current-y_max_l">N/A</span></p>
+                <p>Z Max Limit: <span id="current-z_max_l">N/A</span></p>
+                <p>Homing Speed X: <span id="current-h_spd_x">N/A</span></p>
+                <p>Homing Speed Y: <span id="current-h_spd_y">N/A</span></p>
+                <p>Homing Speed Z: <span id="current-h_spd_z">N/A</span></p>
+                <p>Homing Speed Slow: <span id="current-homing_speed_slow">N/A</span></p>
                 <p>Max Speed: <span id="current-max_speed">N/A</span></p>
                 <p>Acceleration: <span id="current-accel">N/A</span></p>
+                <p>LED Pin State: <span id="current-LED_PIN_STATE">N/A</span></p>
             </section>
 
+            <section class="movement-controls">
+                <h2>Movement Controls</h2>
+                <div class="control-group">
+                    <h3>Move Absolute</h3>
+                    <label for="move-x">X:</label>
+                    <input type="number" id="move-x" value="0">
+                    <label for="move-y">Y:</label>
+                    <input type="number" id="move-y" value="0">
+                    <label for="move-z">Z:</label>
+                    <input type="number" id="move-z" value="0">
+                    <label for="move-speed">Speed:</label>
+                    <input type="number" id="move-speed" value="1000">
+                    <button id="btn-move-to">Move To</button>
+                </div>
+                <div class="control-group">
+                    <h3>Jog Relative</h3>
+                    <label for="jog-dx">dX:</label>
+                    <input type="number" id="jog-dx" value="0">
+                    <label for="jog-dy">dY:</label>
+                    <input type="number" id="jog-dy" value="0">
+                    <label for="jog-dz">dZ:</label>
+                    <input type="number" id="jog-dz" value="0">
+                    <button id="btn-jog">Jog</button>
+                </div>
+                <div class="control-group">
+                    <h3>Home Position</h3>
+                    <button id="btn-home">Go Home</button>
+                </div>
+                <div class="control-group">
+                    <button id="btn-pos-query">Get Current Position</button>
+                </div>
+                <div class="control-group">
+                    <button id="btn-status-query">Get Full Status</button>
+                </div>
+            </section>
+
+            <section class="led-controls">
+                <h2>LED Control</h2>
+                <div class="control-group">
+                    <button id="btn-led-on">LED ON</button>
+                    <button id="btn-led-off">LED OFF</button>
+                </div>
+            </section>
+        </aside>
+
+        <main id="main-content-area" class="panel">
+            <section class="camera-feed">
+                <h2>Camera Feed</h2>
+                <img id="cameraFeed" src="" alt="Camera Feed">
+            </section>
+
+            <section class="status-display">
+                <h2>Status</h2>
+                <p>Websocket Status: <span id="ws-status">Disconnected</span></p>
+                <p>Current Position: <span id="current-pos">N/A</span></p>
+                <p>Full Status: <span id="current-status">N/A</span></p>
+            </section>
+        </main>
+
+        <aside id="right-sidebar" class="panel">
             <section class="config-controls">
                 <h2>Set Configuration</h2>
                 <div class="control-group">
@@ -44,19 +115,39 @@
                     <button id="btn-set-steps_z">Set Steps Z</button>
                 </div>
                 <div class="control-group">
-                    <label for="set-limit_x">Limit X (0-10000):</label>
-                    <input type="number" id="set-limit_x" min="0" max="10000" step="any" value="1000">
-                    <button id="btn-set-limit_x">Set Limit X</button>
+                    <label for="set-x_max_l">X Max Limit (0-10000):</label>
+                    <input type="number" id="set-x_max_l" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-x_max_l">Set X Max Limit</button>
                 </div>
                 <div class="control-group">
-                    <label for="set-limit_y">Limit Y (0-10000):</label>
-                    <input type="number" id="set-limit_y" min="0" max="10000" step="any" value="1000">
-                    <button id="btn-set-limit_y">Set Limit Y</button>
+                    <label for="set-y_max_l">Y Max Limit (0-10000):</label>
+                    <input type="number" id="set-y_max_l" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-y_max_l">Set Y Max Limit</button>
                 </div>
                 <div class="control-group">
-                    <label for="set-limit_z">Limit Z (0-10000):</label>
-                    <input type="number" id="set-limit_z" min="0" max="10000" step="any" value="1000">
-                    <button id="btn-set-limit_z">Set Limit Z</button>
+                    <label for="set-z_max_l">Z Max Limit (0-10000):</label>
+                    <input type="number" id="set-z_max_l" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-z_max_l">Set Z Max Limit</button>
+                </div>
+                <div class="control-group">
+                    <label for="set-h_spd_x">Homing Speed X (0-10000):</label>
+                    <input type="number" id="set-h_spd_x" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-h_spd_x">Set Homing Speed X</button>
+                </div>
+                <div class="control-group">
+                    <label for="set-h_spd_y">Homing Speed Y (0-10000):</label>
+                    <input type="number" id="set-h_spd_y" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-h_spd_y">Set Homing Speed Y</button>
+                </div>
+                <div class="control-group">
+                    <label for="set-h_spd_z">Homing Speed Z (0-10000):</label>
+                    <input type="number" id="set-h_spd_z" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-h_spd_z">Set Homing Speed Z</button>
+                </div>
+                <div class="control-group">
+                    <label for="set-homing_speed_slow">Homing Speed Slow (0-10000):</label>
+                    <input type="number" id="set-homing_speed_slow" min="0" max="10000" step="any" value="1000">
+                    <button id="btn-set-homing_speed_slow">Set Homing Speed Slow</button>
                 </div>
                 <div class="control-group">
                     <label for="set-max_speed">Max Speed (0-10000):</label>
@@ -70,53 +161,36 @@
                 </div>
             </section>
 
-            <section class="movement-controls">
-                <h2>Movement Controls</h2>
+            <section class="tool-management-controls">
+                <h2>Tool Management Controls</h2>
                 <div class="control-group">
-                    <h3>Move Absolute</h3>
-                    <label for="move-x">X:</label>
-                    <input type="number" id="move-x" value="0">
-                    <label for="move-y">Y:</label>
-                    <input type="number" id="move-y" value="0">
-                    <label for="move-z">Z:</label>
-                    <input type="number" id="move-z" value="0">
-                    <label for="move-speed">Speed:</label>
-                    <input type="number" id="move-speed" value="1000">
-                    <button id="btn-move-to">Move To</button>
+                    <h3>Tool Activation</h3>
+                    <label for="tool-number">Tool Number (1: Laser, 2: Servo):</label>
+                    <input type="number" id="tool-number" min="1" max="2" value="1">
+                    <button id="btn-tool-on">Tool On</button>
+                    <button id="btn-tool-off">Tool Off</button>
                 </div>
                 <div class="control-group">
-                    <h3>Home Position</h3>
-                    <button id="btn-home">Go Home</button>
+                    <h3>Set Tool Value</h3>
+                    <label for="fire-value">Tool Value (0-255):</label>
+                    <input type="number" id="fire-value" min="0" max="255" value="0">
+                    <button id="btn-fire">Set Tool Value</button>
+                </div>
+                <div class="control-group">
+                    <h3>Tool Status</h3>
+                    <button id="btn-get-current-tool-status">Get Current Tool Status</button>
                 </div>
             </section>
+        </aside>
 
-            <section class="laser-controls">
-                <h2>Laser Controls</h2>
-                <div class="control-group">
-                    <label for="set-tool-mode">Tool Mode:</label>
-                    <select id="set-tool-mode">
-                        <option value="laser">Laser</option>
-                        <option value="water">Water</option>
-                    </select>
-                    <button id="btn-set-tool-mode">Set Tool Mode</button>
-                </div>
-                <div class="control-group">
-                    <button id="btn-fire-tool">Fire Tool</button>
-                    <button id="btn-stop-tool">Stop Tool</button>
-                </div>
-            </section>
-
-            <section class="camera-feed">
-                <h2>Camera Feed</h2>
-                <img id="cameraFeed" src="" alt="Camera Feed">
-            </section>
-
-            <section class="status-log">
-                <h2>Status Log</h2>
-                <p>Websocket Status: <span id="ws-status">Disconnected</span></p>
-                <div id="log-output"></div>
-            </section>
-        </div>
+        <section id="console" class="panel">
+            <h2>Console</h2>
+            <div id="log-output"></div>
+            <div class="arduino-command-input-group">
+                <input type="text" id="arduino-command-input" placeholder="Enter Arduino command (e.g., G0 X10 Y20)">
+                <button id="send-arduino-command">Send Raw</button>
+            </div>
+        </section>
     </div>
 
     <script src="static/script.js"></script>

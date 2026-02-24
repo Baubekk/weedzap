@@ -1,5 +1,5 @@
 {
-    "steps_x": 20,
+    "steps_x": 1000.0,
     "steps_y": 1000,
     "steps_z": 400.0,
     "limit_x": 500.0,
@@ -10,5 +10,13 @@
     "movement_mode": "hold",
     "laser_movement_mode": "hold",
     "laser_state": "safe",
-    "speed": 1000.0
+    "speed": 1000.0,
+    "x_max_l": 730.0,
+    "y_max_l": 390.0,
+    "z_max_l": 188.0,
+    "h_spd_x": 600.0,
+    "h_spd_y": 900.0,
+    "h_spd_z": 600.0,
+    "homing_speed_slow": 200.0,
+    "LED_PIN_STATE": 0
 }
