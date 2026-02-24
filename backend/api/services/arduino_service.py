@@ -27,7 +27,14 @@ class ArduinoService:
             time.sleep(self.retry_interval)
 
     def _connect(self):
-        port = "/dev/ttyACM0"
+        ports = serial.tools.list_ports.comports()
+
+        acm_ports = [p.device for p in ports if "ttyACM" in p.device]
+
+        if not acm_ports:
+            raise RuntimeError("No /dev/ttyACMx devices found")
+
+        port = acm_ports[0]
         try:
             print(f"Trying {port}...")
             s = serial.Serial(port, self.baudrate, timeout=1)
